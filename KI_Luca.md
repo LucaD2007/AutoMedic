@@ -103,8 +103,17 @@ Entwicklung einer digitalen Terminbuchungsplattform fuer Arztpraxen. Das System 
 - **Arztpraxis (7 Aktivitaeten + 1 Gateway):** Notfallalarm empfangen, Dringlichkeit pruefen, Sofort-Fall? (XOR: Ja -> Aktuelle Behandlung unterbrechen/delegieren / Nein -> Wartezimmer-Reihenfolge anpassen), Behandlungsraum vorbereiten, Notfallpatient behandeln, Behandlung dokumentieren, Notfallprotokoll abschliessen
 - **Datenobjekte:** Symptombeschreibung, Notfallprotokoll, Triage-Einstufung
 - **Data Stores:** Terminkalender, Patientendatenbank, Notfallregister
+
+### 08 - Apotheke suchen
+- **Pools:** Patient, Terminbuchungsplattform, Apotheke
+- **Elemente:** 9 + 13 + 6 Aktivitaeten, 4 Gateways, 8 Message Flows
+- **Patient (9 Aktivitaeten + 1 Gateway):** Plattform oeffnen und Apothekensuche starten, Standort freigeben und Suchkriterien eingeben, Ergebnisliste erhalten, Apotheken vergleichen (Entfernung, Oeffnungszeiten, Bewertungen), Apotheke auswaehlen, Detailseite einsehen (Adresse, Telefon, Route, Verfuegbarkeit), Medikament reservieren? (XOR: Ja -> Reservierung bestaetigen + Bestaetigung erhalten / Nein -> direkt weiter), Apotheke aufsuchen
+- **System (13 Aktivitaeten + 2 Gateways):** Suchanfrage empfangen, Apotheken im Umkreis ermitteln, Apotheken gefunden? (XOR: Nein -> Hinweis, Prozessende / Ja -> Oeffnungszeiten und Entfernung berechnen), Verfuegbarkeitsanfrage an Apotheken senden, Bestandsrueckmeldungen empfangen, Ergebnisliste an Patient senden, Apothekenwahl empfangen, Detaildaten laden, Detailinfos an Patient senden, Reservierung angefragt? (XOR: Ja -> Reservierungsanfrage an Apotheke, Bestaetigung empfangen, an Patient weiterleiten / Nein -> Ende)
+- **Apotheke (6 Aktivitaeten + 1 Gateway):** Verfuegbarkeitsanfrage empfangen, Medikamentenbestand pruefen und rueckmelden, Reservierungsanfrage abwarten (Message Intermediate Catch), Reservierungsanfrage empfangen, Medikament noch verfuegbar? (XOR: Nein -> Hinweis nicht verfuegbar, Ende / Ja -> Medikament reservieren und bestaetigen, Reservierung im System vermerken)
+- **Datenobjekte:** --
+- **Data Stores:** Apothekendatenbank, Medikamentenbestand, Lagerbestand
 | 07  | Notfallpatient                         | Entwurf    | 3 Pools (Patient/Begleitperson, System, Praxis). Notfall-Triage, Terminverschiebung regulaerer Patienten, Notfallprotokoll, Parallele Benachrichtigung. |
-| 08  | Apotheke suchen                        | Offen      |                                                      |
+| 08  | Apotheke suchen                        | Entwurf    | 3 Pools (Patient, System, Apotheke). Standortbasierte Suche, Medikamentenverfuegbarkeit, optionale Reservierung. |
 | 09  | Post-Termin (aus Arztsicht)            | Offen      | inkl. Rezept freigeben                               |
 | 10  | (noch offen)                           | Offen      |                                                      |
 
@@ -116,14 +125,14 @@ Entwicklung einer digitalen Terminbuchungsplattform fuer Arztpraxen. Das System 
 
 | Artefakt                       | Anzahl | Erledigt | Offen |
 |--------------------------------|--------|----------|-------|
-| BPMN-Kollaborationsdiagramme   | 10     | 7        | 3     |
+| BPMN-Kollaborationsdiagramme   | 10     | 8        | 2     |
 | Use-Case-Diagramm              | 1      | 0        | 1     |
 | Klassendiagramm                | 1      | 0        | 1     |
 | Sequenzdiagramme               | 5      | 0        | 5     |
 | Projektdokumentation (20 S.)   | 1      | 0        | 1     |
 | Abschlusspraesentation         | 1      | 0        | 1     |
 | Abgabe-ZIP                     | 1      | 0        | 1     |
-| **Gesamt**                     | **20** | **7**    | **13**|
+| **Gesamt**                     | **20** | **8**    | **12**|
 
 ### 1. BPMN-Modellierung (Gewicht: 15%, gruppenbasiert)
 - 10 BPMN-Kollaborationsdiagramme, durchschnittlich je 10 Aktivitaeten
@@ -221,4 +230,5 @@ Entwicklung einer digitalen Terminbuchungsplattform fuer Arztpraxen. Das System 
 | 08.09.2026 | Detailaufbau aller 5 bisherigen BPMN-Diagramme in KI_Luca.md dokumentiert |
 | 08.09.2026 | BPMN-Diagramm 06 (Check-In beim Arzt) als Entwurf erstellt inkl. Detailaufbau |
 | 08.09.2026 | BPMN-Diagramm 07 (Notfallpatient) als Entwurf erstellt inkl. Detailaufbau |
+| 08.09.2026 | BPMN-Diagramm 08 (Apotheke suchen) als Entwurf erstellt inkl. Detailaufbau |
 | 01.09.2026 | Datei umbenannt von Fallstudie.md zu KI_Luca.md |
