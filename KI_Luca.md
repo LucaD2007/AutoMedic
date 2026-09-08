@@ -112,9 +112,18 @@ Entwicklung einer digitalen Terminbuchungsplattform fuer Arztpraxen. Das System 
 - **Apotheke (6 Aktivitaeten + 1 Gateway):** Verfuegbarkeitsanfrage empfangen, Medikamentenbestand pruefen und rueckmelden, Reservierungsanfrage abwarten (Message Intermediate Catch), Reservierungsanfrage empfangen, Medikament noch verfuegbar? (XOR: Nein -> Hinweis nicht verfuegbar, Ende / Ja -> Medikament reservieren und bestaetigen, Reservierung im System vermerken)
 - **Datenobjekte:** --
 - **Data Stores:** Apothekendatenbank, Medikamentenbestand, Lagerbestand
+
+### 09 - Post-Termin (aus Arztsicht)
+- **Pools:** Arzt, Terminbuchungsplattform, Patient
+- **Elemente:** 9 + 14 + 7 Aktivitaeten, 7 Gateways, 9 Message Flows
+- **Arzt (9 Aktivitaeten + 4 Gateways):** Behandlung dokumentieren, Behandlungsdaten im System erfassen, Diagnose und Massnahmen festhalten (Datenobjekt: Diagnosebericht), Rezept erforderlich? (XOR: Ja -> Rezept erstellen + digital signieren und freigeben (Datenobjekt: Rezept)), Folgeaktion noetig? (XOR: Folgetermin -> Folgetermin anordnen / Ueberweisung -> Ueberweisung ausstellen / Keine -> weiter), Folgeaktion im System erfassen, Patientenakte abschliessen
+- **System (14 Aktivitaeten + 4 Gateways):** Behandlungsdaten empfangen, Patientenakte aktualisieren, Diagnose und Massnahmen speichern, Abrechnungsdaten vorbereiten, Rezeptfreigabe empfangen, Rezept validieren und speichern, Rezept digital an Patient senden, Apotheke vorgemerkt? (XOR: Ja -> Rezept an Apotheke weiterleiten / Nein -> weiter), Folgeaktion empfangen, Art der Folgeaktion? (XOR: Folgetermin -> Freie Termine ermitteln + Vorschlaege an Patient + Terminwahl empfangen und buchen / Ueberweisung -> Ueberweisung erstellen und speichern / Keine -> weiter), Zusammenfassung an Patient senden, Feedback-Anfrage senden, Feedback empfangen und speichern
+- **Patient (7 Aktivitaeten + 1 Gateway):** Zusammenfassung einsehen, Digitales Rezept empfangen, Rezept pruefen und speichern, Folgetermin-Vorschlaege erhalten, Folgetermin auswaehlen und bestaetigen, Feedback-Anfrage erhalten, Feedback geben? (XOR: Ja -> Feedback verfassen und absenden / Nein -> Ende)
+- **Datenobjekte:** Diagnosebericht, Rezept
+- **Data Stores:** Patientendatenbank, Rezeptdatenbank, Terminkalender
 | 07  | Notfallpatient                         | Entwurf    | 3 Pools (Patient/Begleitperson, System, Praxis). Notfall-Triage, Terminverschiebung regulaerer Patienten, Notfallprotokoll, Parallele Benachrichtigung. |
 | 08  | Apotheke suchen                        | Entwurf    | 3 Pools (Patient, System, Apotheke). Standortbasierte Suche, Medikamentenverfuegbarkeit, optionale Reservierung. |
-| 09  | Post-Termin (aus Arztsicht)            | Offen      | inkl. Rezept freigeben                               |
+| 09  | Post-Termin (aus Arztsicht)            | Entwurf    | 3 Pools (Arzt, System, Patient). Behandlungsdokumentation, digitale Rezeptfreigabe, Folgetermin/Ueberweisung (3-Wege-Gateway), Feedback, Abrechnung. |
 | 10  | (noch offen)                           | Offen      |                                                      |
 
 ---
@@ -125,14 +134,14 @@ Entwicklung einer digitalen Terminbuchungsplattform fuer Arztpraxen. Das System 
 
 | Artefakt                       | Anzahl | Erledigt | Offen |
 |--------------------------------|--------|----------|-------|
-| BPMN-Kollaborationsdiagramme   | 10     | 8        | 2     |
+| BPMN-Kollaborationsdiagramme   | 10     | 9        | 1     |
 | Use-Case-Diagramm              | 1      | 0        | 1     |
 | Klassendiagramm                | 1      | 0        | 1     |
 | Sequenzdiagramme               | 5      | 0        | 5     |
 | Projektdokumentation (20 S.)   | 1      | 0        | 1     |
 | Abschlusspraesentation         | 1      | 0        | 1     |
 | Abgabe-ZIP                     | 1      | 0        | 1     |
-| **Gesamt**                     | **20** | **8**    | **12**|
+| **Gesamt**                     | **20** | **9**    | **11**|
 
 ### 1. BPMN-Modellierung (Gewicht: 15%, gruppenbasiert)
 - 10 BPMN-Kollaborationsdiagramme, durchschnittlich je 10 Aktivitaeten
@@ -231,4 +240,5 @@ Entwicklung einer digitalen Terminbuchungsplattform fuer Arztpraxen. Das System 
 | 08.09.2026 | BPMN-Diagramm 06 (Check-In beim Arzt) als Entwurf erstellt inkl. Detailaufbau |
 | 08.09.2026 | BPMN-Diagramm 07 (Notfallpatient) als Entwurf erstellt inkl. Detailaufbau |
 | 08.09.2026 | BPMN-Diagramm 08 (Apotheke suchen) als Entwurf erstellt inkl. Detailaufbau |
+| 08.09.2026 | BPMN-Diagramm 09 (Post-Termin) als Entwurf erstellt inkl. Detailaufbau |
 | 01.09.2026 | Datei umbenannt von Fallstudie.md zu KI_Luca.md |

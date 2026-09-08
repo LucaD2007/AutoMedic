@@ -1,0 +1,410 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             id="Definitions_09"
+             targetNamespace="http://bpmn.io/schema/bpmn">
+
+  <!-- ============================================================ -->
+  <!--  COLLABORATION                                                -->
+  <!-- ============================================================ -->
+  <collaboration id="Collaboration_09">
+    <participant id="Pool_Arzt" name="Arzt" processRef="Process_Arzt" />
+    <participant id="Pool_System" name="Terminbuchungsplattform" processRef="Process_System" />
+    <participant id="Pool_Patient" name="Patient" processRef="Process_Patient" />
+
+    <messageFlow id="MF1" name="Behandlungsdaten uebermitteln" sourceRef="Task_A2" targetRef="Task_S1" />
+    <messageFlow id="MF2" name="Rezept zur Freigabe" sourceRef="Task_A5" targetRef="Task_S5" />
+    <messageFlow id="MF3" name="Folgeaktion erfasst" sourceRef="Task_A8" targetRef="Task_S9" />
+    <messageFlow id="MF4" name="Zusammenfassung" sourceRef="Task_S12" targetRef="Task_P1" />
+    <messageFlow id="MF5" name="Rezept digital" sourceRef="Task_S7" targetRef="Task_P2" />
+    <messageFlow id="MF6" name="Folgetermin-Vorschlaege" sourceRef="Task_S11" targetRef="Task_P4" />
+    <messageFlow id="MF7" name="Terminwahl" sourceRef="Task_P5" targetRef="Task_S11b" />
+    <messageFlow id="MF8" name="Feedback-Anfrage" sourceRef="Task_S13" targetRef="Task_P6" />
+    <messageFlow id="MF9" name="Feedback" sourceRef="Task_P7" targetRef="Task_S14" />
+  </collaboration>
+
+  <!-- ============================================================ -->
+  <!--  ARZT                                                         -->
+  <!-- ============================================================ -->
+  <process id="Process_Arzt" isExecutable="false">
+    <startEvent id="Start_A" name="Behandlung abgeschlossen" />
+    <task id="Task_A1" name="Behandlung dokumentieren" />
+    <task id="Task_A2" name="Behandlungsdaten im System erfassen" />
+    <task id="Task_A3" name="Diagnose und Massnahmen festhalten" />
+    <exclusiveGateway id="GW_A1" name="Rezept erforderlich?" />
+    <task id="Task_A4" name="Rezept erstellen" />
+    <task id="Task_A5" name="Rezept digital signieren und freigeben" />
+    <exclusiveGateway id="GW_A2" name="Folgeaktion noetig?" />
+    <task id="Task_A6" name="Folgetermin anordnen" />
+    <task id="Task_A7" name="Ueberweisung ausstellen" />
+    <exclusiveGateway id="GW_A2_merge" />
+    <task id="Task_A8" name="Folgeaktion im System erfassen" />
+    <exclusiveGateway id="GW_A1_merge" />
+    <task id="Task_A9" name="Patientenakte abschliessen" />
+    <endEvent id="End_A" name="Post-Termin abgeschlossen" />
+
+    <dataObjectReference id="DO_Diagnose" name="Diagnosebericht" dataObjectRef="DataObj_Diagnose" />
+    <dataObject id="DataObj_Diagnose" />
+    <dataObjectReference id="DO_Rezept" name="Rezept" dataObjectRef="DataObj_Rezept" />
+    <dataObject id="DataObj_Rezept" />
+
+    <sequenceFlow id="sf_a1" sourceRef="Start_A" targetRef="Task_A1" />
+    <sequenceFlow id="sf_a2" sourceRef="Task_A1" targetRef="Task_A2" />
+    <sequenceFlow id="sf_a3" sourceRef="Task_A2" targetRef="Task_A3" />
+    <sequenceFlow id="sf_a4" sourceRef="Task_A3" targetRef="GW_A1" />
+    <sequenceFlow id="sf_a5" name="Ja" sourceRef="GW_A1" targetRef="Task_A4" />
+    <sequenceFlow id="sf_a6" sourceRef="Task_A4" targetRef="Task_A5" />
+    <sequenceFlow id="sf_a7" sourceRef="Task_A5" targetRef="GW_A2" />
+    <sequenceFlow id="sf_a8" name="Nein" sourceRef="GW_A1" targetRef="GW_A1_merge" />
+    <sequenceFlow id="sf_a9" name="Folgetermin" sourceRef="GW_A2" targetRef="Task_A6" />
+    <sequenceFlow id="sf_a10" name="Ueberweisung" sourceRef="GW_A2" targetRef="Task_A7" />
+    <sequenceFlow id="sf_a11" sourceRef="Task_A6" targetRef="GW_A2_merge" />
+    <sequenceFlow id="sf_a12" sourceRef="Task_A7" targetRef="GW_A2_merge" />
+    <sequenceFlow id="sf_a13" name="Keine" sourceRef="GW_A2" targetRef="GW_A1_merge" />
+    <sequenceFlow id="sf_a14" sourceRef="GW_A2_merge" targetRef="Task_A8" />
+    <sequenceFlow id="sf_a15" sourceRef="Task_A8" targetRef="GW_A1_merge" />
+    <sequenceFlow id="sf_a16" sourceRef="GW_A1_merge" targetRef="Task_A9" />
+    <sequenceFlow id="sf_a17" sourceRef="Task_A9" targetRef="End_A" />
+  </process>
+
+  <!-- ============================================================ -->
+  <!--  SYSTEM                                                       -->
+  <!-- ============================================================ -->
+  <process id="Process_System" isExecutable="false">
+    <startEvent id="Start_S" name="Behandlungsdaten empfangen" />
+    <task id="Task_S1" name="Behandlungsdaten empfangen" />
+    <task id="Task_S2" name="Patientenakte aktualisieren" />
+    <task id="Task_S3" name="Diagnose und Massnahmen speichern" />
+    <task id="Task_S4" name="Abrechnungsdaten vorbereiten" />
+    <task id="Task_S5" name="Rezeptfreigabe empfangen" />
+    <task id="Task_S6" name="Rezept validieren und speichern" />
+    <task id="Task_S7" name="Rezept digital an Patient senden" />
+    <exclusiveGateway id="GW_S1" name="Apotheke vorgemerkt?" />
+    <task id="Task_S8" name="Rezept an Apotheke weiterleiten" />
+    <exclusiveGateway id="GW_S1_merge" />
+    <task id="Task_S9" name="Folgeaktion empfangen" />
+    <exclusiveGateway id="GW_S2" name="Art der Folgeaktion?" />
+    <task id="Task_S10" name="Freie Folgetermine ermitteln" />
+    <task id="Task_S11" name="Terminvorschlaege an Patient senden" />
+    <task id="Task_S11b" name="Terminwahl empfangen und buchen" />
+    <task id="Task_S10b" name="Ueberweisung erstellen und speichern" />
+    <exclusiveGateway id="GW_S2_merge" />
+    <task id="Task_S12" name="Zusammenfassung an Patient senden" />
+    <task id="Task_S13" name="Feedback-Anfrage an Patient senden" />
+    <task id="Task_S14" name="Feedback empfangen und speichern" />
+    <endEvent id="End_S" name="Post-Termin-Verarbeitung abgeschlossen" />
+
+    <dataStoreReference id="DS_Patientenakte" name="Patientendatenbank" />
+    <dataStoreReference id="DS_Rezepte" name="Rezeptdatenbank" />
+    <dataStoreReference id="DS_Termine" name="Terminkalender" />
+
+    <sequenceFlow id="sf_s1" sourceRef="Start_S" targetRef="Task_S1" />
+    <sequenceFlow id="sf_s2" sourceRef="Task_S1" targetRef="Task_S2" />
+    <sequenceFlow id="sf_s3" sourceRef="Task_S2" targetRef="Task_S3" />
+    <sequenceFlow id="sf_s4" sourceRef="Task_S3" targetRef="Task_S4" />
+    <sequenceFlow id="sf_s5" sourceRef="Task_S4" targetRef="Task_S5" />
+    <sequenceFlow id="sf_s6" sourceRef="Task_S5" targetRef="Task_S6" />
+    <sequenceFlow id="sf_s7" sourceRef="Task_S6" targetRef="Task_S7" />
+    <sequenceFlow id="sf_s8" sourceRef="Task_S7" targetRef="GW_S1" />
+    <sequenceFlow id="sf_s9" name="Ja" sourceRef="GW_S1" targetRef="Task_S8" />
+    <sequenceFlow id="sf_s10" sourceRef="Task_S8" targetRef="GW_S1_merge" />
+    <sequenceFlow id="sf_s11" name="Nein" sourceRef="GW_S1" targetRef="GW_S1_merge" />
+    <sequenceFlow id="sf_s12" sourceRef="GW_S1_merge" targetRef="Task_S9" />
+    <sequenceFlow id="sf_s13" sourceRef="Task_S9" targetRef="GW_S2" />
+    <sequenceFlow id="sf_s14" name="Folgetermin" sourceRef="GW_S2" targetRef="Task_S10" />
+    <sequenceFlow id="sf_s15" sourceRef="Task_S10" targetRef="Task_S11" />
+    <sequenceFlow id="sf_s16" sourceRef="Task_S11" targetRef="Task_S11b" />
+    <sequenceFlow id="sf_s17" sourceRef="Task_S11b" targetRef="GW_S2_merge" />
+    <sequenceFlow id="sf_s18" name="Ueberweisung" sourceRef="GW_S2" targetRef="Task_S10b" />
+    <sequenceFlow id="sf_s19" sourceRef="Task_S10b" targetRef="GW_S2_merge" />
+    <sequenceFlow id="sf_s20" name="Keine" sourceRef="GW_S2" targetRef="GW_S2_merge" />
+    <sequenceFlow id="sf_s21" sourceRef="GW_S2_merge" targetRef="Task_S12" />
+    <sequenceFlow id="sf_s22" sourceRef="Task_S12" targetRef="Task_S13" />
+    <sequenceFlow id="sf_s23" sourceRef="Task_S13" targetRef="Task_S14" />
+    <sequenceFlow id="sf_s24" sourceRef="Task_S14" targetRef="End_S" />
+  </process>
+
+  <!-- ============================================================ -->
+  <!--  PATIENT                                                      -->
+  <!-- ============================================================ -->
+  <process id="Process_Patient" isExecutable="false">
+    <startEvent id="Start_P" name="Zusammenfassung erhalten" />
+    <task id="Task_P1" name="Zusammenfassung des Termins einsehen" />
+    <task id="Task_P2" name="Digitales Rezept empfangen" />
+    <task id="Task_P3" name="Rezept pruefen und speichern" />
+    <task id="Task_P4" name="Folgetermin-Vorschlaege erhalten" />
+    <task id="Task_P5" name="Folgetermin auswaehlen und bestaetigen" />
+    <task id="Task_P6" name="Feedback-Anfrage erhalten" />
+    <exclusiveGateway id="GW_P1" name="Feedback geben?" />
+    <task id="Task_P7" name="Feedback verfassen und absenden" />
+    <exclusiveGateway id="GW_P1_merge" />
+    <endEvent id="End_P" name="Post-Termin abgeschlossen" />
+
+    <sequenceFlow id="sf_p1" sourceRef="Start_P" targetRef="Task_P1" />
+    <sequenceFlow id="sf_p2" sourceRef="Task_P1" targetRef="Task_P2" />
+    <sequenceFlow id="sf_p3" sourceRef="Task_P2" targetRef="Task_P3" />
+    <sequenceFlow id="sf_p4" sourceRef="Task_P3" targetRef="Task_P4" />
+    <sequenceFlow id="sf_p5" sourceRef="Task_P4" targetRef="Task_P5" />
+    <sequenceFlow id="sf_p6" sourceRef="Task_P5" targetRef="Task_P6" />
+    <sequenceFlow id="sf_p7" sourceRef="Task_P6" targetRef="GW_P1" />
+    <sequenceFlow id="sf_p8" name="Ja" sourceRef="GW_P1" targetRef="Task_P7" />
+    <sequenceFlow id="sf_p9" sourceRef="Task_P7" targetRef="GW_P1_merge" />
+    <sequenceFlow id="sf_p10" name="Nein" sourceRef="GW_P1" targetRef="GW_P1_merge" />
+    <sequenceFlow id="sf_p11" sourceRef="GW_P1_merge" targetRef="End_P" />
+  </process>
+
+  <!-- ============================================================ -->
+  <!--  DIAGRAM                                                      -->
+  <!-- ============================================================ -->
+  <bpmndi:BPMNDiagram id="BPMNDiagram_09">
+    <bpmndi:BPMNPlane id="BPMNPlane_09" bpmnElement="Collaboration_09">
+
+      <!-- Pool: Arzt -->
+      <bpmndi:BPMNShape id="Shape_Pool_Arzt" bpmnElement="Pool_Arzt" isHorizontal="true">
+        <omgdc:Bounds x="160" y="20" width="1640" height="280" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Start_A" bpmnElement="Start_A">
+        <omgdc:Bounds x="210" y="132" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_A1" bpmnElement="Task_A1">
+        <omgdc:Bounds x="280" y="110" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_A2" bpmnElement="Task_A2">
+        <omgdc:Bounds x="410" y="110" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_A3" bpmnElement="Task_A3">
+        <omgdc:Bounds x="540" y="110" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GW_A1" bpmnElement="GW_A1" isMarkerVisible="true">
+        <omgdc:Bounds x="670" y="130" width="40" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_A4" bpmnElement="Task_A4">
+        <omgdc:Bounds x="740" y="60" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_A5" bpmnElement="Task_A5">
+        <omgdc:Bounds x="870" y="60" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GW_A2" bpmnElement="GW_A2" isMarkerVisible="true">
+        <omgdc:Bounds x="1000" y="80" width="40" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_A6" bpmnElement="Task_A6">
+        <omgdc:Bounds x="1080" y="30" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_A7" bpmnElement="Task_A7">
+        <omgdc:Bounds x="1080" y="130" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GW_A2_merge" bpmnElement="GW_A2_merge" isMarkerVisible="true">
+        <omgdc:Bounds x="1210" y="80" width="40" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_A8" bpmnElement="Task_A8">
+        <omgdc:Bounds x="1280" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GW_A1_merge" bpmnElement="GW_A1_merge" isMarkerVisible="true">
+        <omgdc:Bounds x="1420" y="130" width="40" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_A9" bpmnElement="Task_A9">
+        <omgdc:Bounds x="1500" y="110" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_End_A" bpmnElement="End_A">
+        <omgdc:Bounds x="1640" y="132" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_DO_Diagnose" bpmnElement="DO_Diagnose">
+        <omgdc:Bounds x="572" y="220" width="36" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_DO_Rezept" bpmnElement="DO_Rezept">
+        <omgdc:Bounds x="772" y="170" width="36" height="50" />
+      </bpmndi:BPMNShape>
+
+      <!-- Pool: System -->
+      <bpmndi:BPMNShape id="Shape_Pool_System" bpmnElement="Pool_System" isHorizontal="true">
+        <omgdc:Bounds x="160" y="350" width="1640" height="310" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Start_S" bpmnElement="Start_S">
+        <omgdc:Bounds x="210" y="472" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_S1" bpmnElement="Task_S1">
+        <omgdc:Bounds x="280" y="450" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_S2" bpmnElement="Task_S2">
+        <omgdc:Bounds x="400" y="450" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_S3" bpmnElement="Task_S3">
+        <omgdc:Bounds x="520" y="450" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_S4" bpmnElement="Task_S4">
+        <omgdc:Bounds x="640" y="450" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_S5" bpmnElement="Task_S5">
+        <omgdc:Bounds x="760" y="450" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_S6" bpmnElement="Task_S6">
+        <omgdc:Bounds x="760" y="370" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_S7" bpmnElement="Task_S7">
+        <omgdc:Bounds x="880" y="370" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GW_S1" bpmnElement="GW_S1" isMarkerVisible="true">
+        <omgdc:Bounds x="910" y="470" width="40" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_S8" bpmnElement="Task_S8">
+        <omgdc:Bounds x="960" y="540" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GW_S1_merge" bpmnElement="GW_S1_merge" isMarkerVisible="true">
+        <omgdc:Bounds x="1010" y="470" width="40" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_S9" bpmnElement="Task_S9">
+        <omgdc:Bounds x="1070" y="450" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GW_S2" bpmnElement="GW_S2" isMarkerVisible="true">
+        <omgdc:Bounds x="1190" y="470" width="40" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_S10" bpmnElement="Task_S10">
+        <omgdc:Bounds x="1250" y="370" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_S11" bpmnElement="Task_S11">
+        <omgdc:Bounds x="1370" y="370" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_S11b" bpmnElement="Task_S11b">
+        <omgdc:Bounds x="1490" y="370" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_S10b" bpmnElement="Task_S10b">
+        <omgdc:Bounds x="1250" y="540" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GW_S2_merge" bpmnElement="GW_S2_merge" isMarkerVisible="true">
+        <omgdc:Bounds x="1520" y="470" width="40" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_S12" bpmnElement="Task_S12">
+        <omgdc:Bounds x="1580" y="450" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_S13" bpmnElement="Task_S13">
+        <omgdc:Bounds x="1580" y="550" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_S14" bpmnElement="Task_S14">
+        <omgdc:Bounds x="1700" y="550" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_End_S" bpmnElement="End_S">
+        <omgdc:Bounds x="1732" y="472" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_DS_Patientenakte" bpmnElement="DS_Patientenakte">
+        <omgdc:Bounds x="425" y="560" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_DS_Rezepte" bpmnElement="DS_Rezepte">
+        <omgdc:Bounds x="785" y="560" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_DS_Termine" bpmnElement="DS_Termine">
+        <omgdc:Bounds x="1275" y="460" width="50" height="50" />
+      </bpmndi:BPMNShape>
+
+      <!-- Pool: Patient -->
+      <bpmndi:BPMNShape id="Shape_Pool_Patient" bpmnElement="Pool_Patient" isHorizontal="true">
+        <omgdc:Bounds x="160" y="710" width="1640" height="250" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Start_P" bpmnElement="Start_P">
+        <omgdc:Bounds x="210" y="812" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1" bpmnElement="Task_P1">
+        <omgdc:Bounds x="280" y="790" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P2" bpmnElement="Task_P2">
+        <omgdc:Bounds x="420" y="790" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P3" bpmnElement="Task_P3">
+        <omgdc:Bounds x="560" y="790" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P4" bpmnElement="Task_P4">
+        <omgdc:Bounds x="700" y="790" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P5" bpmnElement="Task_P5">
+        <omgdc:Bounds x="840" y="790" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P6" bpmnElement="Task_P6">
+        <omgdc:Bounds x="980" y="790" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GW_P1" bpmnElement="GW_P1" isMarkerVisible="true">
+        <omgdc:Bounds x="1120" y="810" width="40" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P7" bpmnElement="Task_P7">
+        <omgdc:Bounds x="1200" y="740" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GW_P1_merge" bpmnElement="GW_P1_merge" isMarkerVisible="true">
+        <omgdc:Bounds x="1340" y="810" width="40" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_End_P" bpmnElement="End_P">
+        <omgdc:Bounds x="1420" y="812" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <!-- Sequence Flows Arzt -->
+      <bpmndi:BPMNEdge id="Edge_sf_a1" bpmnElement="sf_a1"><omgdi:waypoint x="246" y="150" /><omgdi:waypoint x="280" y="150" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_a2" bpmnElement="sf_a2"><omgdi:waypoint x="380" y="150" /><omgdi:waypoint x="410" y="150" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_a3" bpmnElement="sf_a3"><omgdi:waypoint x="510" y="150" /><omgdi:waypoint x="540" y="150" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_a4" bpmnElement="sf_a4"><omgdi:waypoint x="640" y="150" /><omgdi:waypoint x="670" y="150" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_a5" bpmnElement="sf_a5"><omgdi:waypoint x="690" y="130" /><omgdi:waypoint x="690" y="100" /><omgdi:waypoint x="740" y="100" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_a6" bpmnElement="sf_a6"><omgdi:waypoint x="840" y="100" /><omgdi:waypoint x="870" y="100" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_a7" bpmnElement="sf_a7"><omgdi:waypoint x="970" y="100" /><omgdi:waypoint x="1000" y="100" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_a8" bpmnElement="sf_a8"><omgdi:waypoint x="690" y="170" /><omgdi:waypoint x="690" y="230" /><omgdi:waypoint x="1440" y="230" /><omgdi:waypoint x="1440" y="170" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_a9" bpmnElement="sf_a9"><omgdi:waypoint x="1020" y="80" /><omgdi:waypoint x="1020" y="70" /><omgdi:waypoint x="1080" y="70" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_a10" bpmnElement="sf_a10"><omgdi:waypoint x="1020" y="120" /><omgdi:waypoint x="1020" y="170" /><omgdi:waypoint x="1080" y="170" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_a11" bpmnElement="sf_a11"><omgdi:waypoint x="1180" y="70" /><omgdi:waypoint x="1230" y="70" /><omgdi:waypoint x="1230" y="80" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_a12" bpmnElement="sf_a12"><omgdi:waypoint x="1180" y="170" /><omgdi:waypoint x="1230" y="170" /><omgdi:waypoint x="1230" y="120" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_a13" bpmnElement="sf_a13"><omgdi:waypoint x="1040" y="100" /><omgdi:waypoint x="1060" y="100" /><omgdi:waypoint x="1060" y="250" /><omgdi:waypoint x="1440" y="250" /><omgdi:waypoint x="1440" y="170" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_a14" bpmnElement="sf_a14"><omgdi:waypoint x="1250" y="100" /><omgdi:waypoint x="1280" y="120" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_a15" bpmnElement="sf_a15"><omgdi:waypoint x="1380" y="120" /><omgdi:waypoint x="1420" y="150" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_a16" bpmnElement="sf_a16"><omgdi:waypoint x="1460" y="150" /><omgdi:waypoint x="1500" y="150" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_a17" bpmnElement="sf_a17"><omgdi:waypoint x="1600" y="150" /><omgdi:waypoint x="1640" y="150" /></bpmndi:BPMNEdge>
+
+      <!-- Sequence Flows System -->
+      <bpmndi:BPMNEdge id="Edge_sf_s1" bpmnElement="sf_s1"><omgdi:waypoint x="246" y="490" /><omgdi:waypoint x="280" y="490" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_s2" bpmnElement="sf_s2"><omgdi:waypoint x="380" y="490" /><omgdi:waypoint x="400" y="490" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_s3" bpmnElement="sf_s3"><omgdi:waypoint x="500" y="490" /><omgdi:waypoint x="520" y="490" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_s4" bpmnElement="sf_s4"><omgdi:waypoint x="620" y="490" /><omgdi:waypoint x="640" y="490" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_s5" bpmnElement="sf_s5"><omgdi:waypoint x="740" y="490" /><omgdi:waypoint x="760" y="490" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_s6" bpmnElement="sf_s6"><omgdi:waypoint x="810" y="450" /><omgdi:waypoint x="810" y="450" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_s7" bpmnElement="sf_s7"><omgdi:waypoint x="860" y="410" /><omgdi:waypoint x="880" y="410" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_s8" bpmnElement="sf_s8"><omgdi:waypoint x="930" y="450" /><omgdi:waypoint x="930" y="470" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_s9" bpmnElement="sf_s9"><omgdi:waypoint x="930" y="510" /><omgdi:waypoint x="930" y="580" /><omgdi:waypoint x="960" y="580" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_s10" bpmnElement="sf_s10"><omgdi:waypoint x="1060" y="580" /><omgdi:waypoint x="1030" y="580" /><omgdi:waypoint x="1030" y="510" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_s11" bpmnElement="sf_s11"><omgdi:waypoint x="950" y="490" /><omgdi:waypoint x="1010" y="490" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_s12" bpmnElement="sf_s12"><omgdi:waypoint x="1050" y="490" /><omgdi:waypoint x="1070" y="490" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_s13" bpmnElement="sf_s13"><omgdi:waypoint x="1170" y="490" /><omgdi:waypoint x="1190" y="490" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_s14" bpmnElement="sf_s14"><omgdi:waypoint x="1210" y="470" /><omgdi:waypoint x="1210" y="410" /><omgdi:waypoint x="1250" y="410" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_s15" bpmnElement="sf_s15"><omgdi:waypoint x="1350" y="410" /><omgdi:waypoint x="1370" y="410" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_s16" bpmnElement="sf_s16"><omgdi:waypoint x="1470" y="410" /><omgdi:waypoint x="1490" y="410" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_s17" bpmnElement="sf_s17"><omgdi:waypoint x="1540" y="450" /><omgdi:waypoint x="1540" y="470" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_s18" bpmnElement="sf_s18"><omgdi:waypoint x="1210" y="510" /><omgdi:waypoint x="1210" y="580" /><omgdi:waypoint x="1250" y="580" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_s19" bpmnElement="sf_s19"><omgdi:waypoint x="1350" y="580" /><omgdi:waypoint x="1540" y="580" /><omgdi:waypoint x="1540" y="510" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_s20" bpmnElement="sf_s20"><omgdi:waypoint x="1230" y="490" /><omgdi:waypoint x="1520" y="490" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_s21" bpmnElement="sf_s21"><omgdi:waypoint x="1560" y="490" /><omgdi:waypoint x="1580" y="490" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_s22" bpmnElement="sf_s22"><omgdi:waypoint x="1630" y="530" /><omgdi:waypoint x="1630" y="550" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_s23" bpmnElement="sf_s23"><omgdi:waypoint x="1680" y="590" /><omgdi:waypoint x="1700" y="590" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_s24" bpmnElement="sf_s24"><omgdi:waypoint x="1750" y="550" /><omgdi:waypoint x="1750" y="490" /></bpmndi:BPMNEdge>
+
+      <!-- Sequence Flows Patient -->
+      <bpmndi:BPMNEdge id="Edge_sf_p1" bpmnElement="sf_p1"><omgdi:waypoint x="246" y="830" /><omgdi:waypoint x="280" y="830" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_p2" bpmnElement="sf_p2"><omgdi:waypoint x="380" y="830" /><omgdi:waypoint x="420" y="830" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_p3" bpmnElement="sf_p3"><omgdi:waypoint x="520" y="830" /><omgdi:waypoint x="560" y="830" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_p4" bpmnElement="sf_p4"><omgdi:waypoint x="660" y="830" /><omgdi:waypoint x="700" y="830" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_p5" bpmnElement="sf_p5"><omgdi:waypoint x="800" y="830" /><omgdi:waypoint x="840" y="830" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_p6" bpmnElement="sf_p6"><omgdi:waypoint x="940" y="830" /><omgdi:waypoint x="980" y="830" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_p7" bpmnElement="sf_p7"><omgdi:waypoint x="1080" y="830" /><omgdi:waypoint x="1120" y="830" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_p8" bpmnElement="sf_p8"><omgdi:waypoint x="1140" y="810" /><omgdi:waypoint x="1140" y="780" /><omgdi:waypoint x="1200" y="780" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_p9" bpmnElement="sf_p9"><omgdi:waypoint x="1300" y="780" /><omgdi:waypoint x="1360" y="780" /><omgdi:waypoint x="1360" y="810" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_p10" bpmnElement="sf_p10"><omgdi:waypoint x="1160" y="830" /><omgdi:waypoint x="1340" y="830" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_p11" bpmnElement="sf_p11"><omgdi:waypoint x="1380" y="830" /><omgdi:waypoint x="1420" y="830" /></bpmndi:BPMNEdge>
+
+      <!-- Message Flows -->
+      <bpmndi:BPMNEdge id="Edge_MF1" bpmnElement="MF1"><omgdi:waypoint x="460" y="190" /><omgdi:waypoint x="330" y="450" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_MF2" bpmnElement="MF2"><omgdi:waypoint x="920" y="140" /><omgdi:waypoint x="810" y="450" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_MF3" bpmnElement="MF3"><omgdi:waypoint x="1330" y="160" /><omgdi:waypoint x="1120" y="450" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_MF4" bpmnElement="MF4"><omgdi:waypoint x="1630" y="530" /><omgdi:waypoint x="330" y="790" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_MF5" bpmnElement="MF5"><omgdi:waypoint x="930" y="450" /><omgdi:waypoint x="470" y="790" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_MF6" bpmnElement="MF6"><omgdi:waypoint x="1420" y="450" /><omgdi:waypoint x="750" y="790" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_MF7" bpmnElement="MF7"><omgdi:waypoint x="890" y="790" /><omgdi:waypoint x="1540" y="450" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_MF8" bpmnElement="MF8"><omgdi:waypoint x="1630" y="630" /><omgdi:waypoint x="1030" y="790" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_MF9" bpmnElement="MF9"><omgdi:waypoint x="1250" y="740" /><omgdi:waypoint x="1750" y="630" /></bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
