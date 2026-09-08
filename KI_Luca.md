@@ -130,11 +130,21 @@ Entwicklung einer digitalen Terminbuchungsplattform fuer Arztpraxen. Das System 
 - **Arztpraxis (5 Aktivitaeten + 1 Gateway):** Registrierungsanfrage empfangen, Patientendaten und Versicherung pruefen, Daten plausibel? (XOR: Ja -> Patient freigeben und Bestaetigung an System / Nein -> Ablehnungsgrund an System mit Hinweis auf fehlende/fehlerhafte Daten), Patientenakte im Praxissystem anlegen
 - **Datenobjekte:** Stammdaten, Versicherungskarte, Datenschutzerklaerung
 - **Data Stores:** Patientendatenbank, Versicherungsdatenbank
+
+### 11 - Rezept verlaengern / Folgerezept (Reserve)
+- **Pools:** Patient, Terminbuchungsplattform, Arzt, Apotheke
+- **Elemente:** 7 + 12 + 6 + 5 Aktivitaeten, 5 Gateways, 10 Message Flows
+- **Patient (7 Aktivitaeten + 1 Gateway):** Plattform oeffnen, Rezepthistorie einsehen, Medikament fuer Folgerezept auswaehlen, Anmerkung hinzufuegen (Datenobjekt: Patientennotiz), Anfrage absenden, Auf Arztentscheidung warten, Entscheidung erhalten -- XOR: Genehmigt -> Digitales Rezept empfangen und speichern / Abgelehnt -> Ablehnungsgrund einsehen und ggf. Termin buchen
+- **System (12 Aktivitaeten + 3 Gateways):** Folgerezeptanfrage empfangen, Letztes Rezept und Behandlungshistorie laden, Rezeptintervall gueltig? (XOR: Nein -> Hinweis an Patient dass Termin noetig / Ja -> weiter), Anfrage an Arzt weiterleiten, Arztentscheidung empfangen, Genehmigt? (XOR: Nein -> Ablehnungsgrund an Patient / Ja -> Neues Rezept generieren + digital signiertes Rezept speichern), Rezept an Patient senden, Apotheke gewuenscht? (XOR: Ja -> Rezept an Apotheke weiterleiten + Bestaetigung empfangen + an Patient senden / Nein -> Ende)
+- **Arzt (6 Aktivitaeten + 1 Gateway):** Folgerezeptanfrage empfangen, Patientenakte und Medikamentenhistorie pruefen, Medizinisch vertretbar? (XOR: Ja -> Rezept genehmigen + digital signieren (Datenobjekt: Signiertes Rezept) / Nein -> Ablehnung mit Begruendung verfassen), Entscheidung an System uebermitteln
+- **Apotheke (5 Aktivitaeten + 1 Gateway):** Rezept empfangen, Rezept auf Gueltigkeit pruefen, Medikament verfuegbar? (XOR: Ja -> Medikament reservieren + Abholbereitschaft melden / Nein -> Alternative vorschlagen + Rueckmeldung an System)
+- **Datenobjekte:** Patientennotiz, Signiertes Rezept
+- **Data Stores:** Rezeptdatenbank, Patientendatenbank, Medikamentenbestand
 | 07  | Notfallpatient                         | Entwurf    | 3 Pools (Patient/Begleitperson, System, Praxis). Notfall-Triage, Terminverschiebung regulaerer Patienten, Notfallprotokoll, Parallele Benachrichtigung. |
 | 08  | Apotheke suchen                        | Entwurf    | 3 Pools (Patient, System, Apotheke). Standortbasierte Suche, Medikamentenverfuegbarkeit, optionale Reservierung. |
 | 09  | Post-Termin (aus Arztsicht)            | Entwurf    | 3 Pools (Arzt, System, Patient). Behandlungsdokumentation, digitale Rezeptfreigabe, Folgetermin/Ueberweisung (3-Wege-Gateway), Feedback, Abrechnung. |
 | 10  | Patientenregistrierung / Erstanmeldung | Entwurf    | 3 Pools (Patient, System, Arztpraxis). Kontoerstellung, Versicherungsdaten, E-Mail-Verifizierung, Datenschutz, Praxis-Freigabe. |
-| 11  | Rezept verlaengern / Folgerezept       | Reserve    | Patient fordert Folgerezept ohne vollen Termin an, Arzt prueft und gibt frei oder lehnt ab. Pools: Patient, System, Arzt, ggf. Apotheke. |
+| 11  | Rezept verlaengern / Folgerezept       | Entwurf    | 4 Pools (Patient, System, Arzt, Apotheke). Folgerezeptanforderung ohne Termin, Arztpruefung, digitale Signatur, optionale Apothekenweiterleitung. |
 | 12  | Videosprechstunde buchen & durchfuehren| Reserve    | Patient bucht Videosprechstunde statt Vor-Ort-Termin, erhaelt Zugangslink, digitale Konsultation. Pools: Patient, System, Arzt. |
 
 ---
@@ -254,4 +264,5 @@ Entwicklung einer digitalen Terminbuchungsplattform fuer Arztpraxen. Das System 
 | 08.09.2026 | BPMN-Diagramm 09 (Post-Termin) als Entwurf erstellt inkl. Detailaufbau |
 | 08.09.2026 | Prozesse 10-12 festgelegt: 10 Patientenregistrierung, 11 Rezept verlaengern (Reserve), 12 Videosprechstunde (Reserve) |
 | 08.09.2026 | BPMN-Diagramm 10 (Patientenregistrierung) als Entwurf erstellt inkl. Detailaufbau -- Alle 10 BPMN-Diagramme fertig |
+| 08.09.2026 | BPMN-Diagramm 11 (Rezept verlaengern) als Reserve-Entwurf erstellt inkl. Detailaufbau |
 | 01.09.2026 | Datei umbenannt von Fallstudie.md zu KI_Luca.md |
