@@ -34,8 +34,57 @@ Entwicklung einer digitalen Terminbuchungsplattform fuer Arztpraxen. Das System 
 | 02  | Termin absagen                         | Entwurf    | 3 Pools (Patient, System, Praxis). Stornierungspruefung, Geraete entbuchen, Wartelisten-Nachruecker. |
 | 03  | (Regelmaessige) Terminbenachrichtigung | Entwurf    | 3 Pools (System, Patient, Praxis). Timer-Start, 3-Wege-Gateway (Bestaetigung/Absage/Keine Reaktion), Tagesbericht an Praxis. |
 | 04  | Termin verschieben                     | Entwurf    | 3 Pools (Patient, System, Praxis). Fristpruefung, Alternativtermine, Geraete umbuchen, Abbruchpfad. |
-| 05  | Patient ueberweisen                    | Offen      |                                                      |
+| 05  | Patient ueberweisen                    | Entwurf    | 4 Pools (Hausarzt, System, Patient, Facharzt). Facharztsuche, Parallele Benachrichtigung (Parallel Gateway), Ueberweisungsdatenbank. |
 | 06  | Check-In beim Arzt                     | Offen      |                                                      |
+
+---
+
+## Detailaufbau der BPMN-Diagramme
+
+### 01 - Termin suchen & buchen
+- **Pools:** Patient, Terminbuchungsplattform, Arztpraxis
+- **Elemente:** 8 + 10 + 3 Aktivitaeten, 3 Gateways, 6 Message Flows
+- **Patient (8 Aktivitaeten):** Plattform aufrufen, Fachrichtung waehlen, Termine suchen, Termin auswaehlen, Notiz eingeben, Buchung bestaetigen, Bestaetigung erhalten
+- **System (10 Aktivitaeten + 3 Gateways):** Suchanfrage verarbeiten, Verfuegbarkeit pruefen (XOR: verfuegbar?), Termine anzeigen, Buchung empfangen, Termin reservieren, Geraete benoetigt? (XOR), Geraete reservieren, Notiz speichern, Bestaetigung an Patient, Benachrichtigung an Praxis
+- **Arztpraxis (3 Aktivitaeten):** Benachrichtigung pruefen, Kalender einsehen, Vorbereitung planen
+- **Datenobjekte:** Notiz (Was soll gemacht werden)
+- **Data Stores:** Terminkalender, Geraeteverwaltung
+
+### 02 - Termin absagen
+- **Pools:** Patient, Terminbuchungsplattform, Arztpraxis
+- **Elemente:** 7 + 8 + 3 Aktivitaeten, 4 Gateways, 6 Message Flows
+- **Patient (7 Aktivitaeten + 2 Gateways):** Anmelden, gebuchte Termine einsehen, Termin auswaehlen, Absagegrund angeben (optional), Absage bestaetigen, Bestaetigung erhalten
+- **System (8 Aktivitaeten + 3 Gateways):** Absageanfrage verarbeiten, Termin identifizieren, Stornierung moeglich? (XOR), Buchung stornieren, Zeitslot freigeben, Geraete reserviert? (XOR: ja -> Geraete entbuchen), Bestaetigung an Patient, Benachrichtigung an Praxis
+- **Arztpraxis (3 Aktivitaeten + 1 Gateway):** Benachrichtigung pruefen, Kalender aktualisieren, Wartelisten-Check (XOR: ja -> Nachruecker informieren)
+- **Datenobjekte:** Absagegrund
+- **Data Stores:** Terminkalender, Geraeteverwaltung
+
+### 03 - (Regelmaessige) Terminbenachrichtigung
+- **Pools:** Terminbuchungsplattform, Patient, Arztpraxis
+- **Elemente:** 10 + 5 + 3 Aktivitaeten, 4 Gateways, 2 Timer-Events, 5 Message Flows
+- **System (10 Aktivitaeten + 2 Gateways):** Timer-Start (taeglich 08:00), anstehende Termine abfragen (48h), Termine vorhanden? (XOR), Erinnerung generieren, an Patient senden, Versand protokollieren, Wartezeit 12h (Timer Intermediate), Reaktion? (3-Wege-XOR: Bestaetigt/Absage/Keine Reaktion), Bestaetigung speichern / Termin stornieren / Praxis informieren, Tagesbericht an Praxis
+- **Patient (5 Aktivitaeten + 1 Gateway):** Erinnerung empfangen (Message Start), Termindetails pruefen, Entscheidung (XOR: Bestaetigen/Absagen/Ignorieren), Systemrueckmeldung erhalten
+- **Arztpraxis (3 Aktivitaeten):** Tagesbericht pruefen, Patienten ohne Reaktion nachfassen, Tagesplan anpassen
+- **Data Stores:** Terminkalender, Benachrichtigungslog
+
+### 04 - Termin verschieben
+- **Pools:** Patient, Terminbuchungsplattform, Arztpraxis
+- **Elemente:** 7 + 10 + 3 Aktivitaeten, 4 Gateways, 6 Message Flows
+- **Patient (7 Aktivitaeten + 2 Gateways):** Anmelden, Termine einsehen, Termin auswaehlen, Verschiebungsgrund angeben (optional), Anfrage absenden, Verschiebung moeglich? (XOR: Ja -> Alternativtermine erhalten, neuen Termin waehlen, Bestaetigung / Nein -> Hinweis erhalten)
+- **System (10 Aktivitaeten + 3 Gateways):** Anfrage empfangen, Termin identifizieren, Fristpruefung (XOR: Nein -> Abbruchmeldung), Alternative Termine suchen, an Patient senden, neuen Terminwunsch empfangen, alten Termin stornieren und Slot freigeben, Geraete reserviert? (XOR: Ja -> Geraete umbuchen), neuen Termin buchen, Bestaetigung an Patient, Praxis benachrichtigen
+- **Arztpraxis (3 Aktivitaeten):** Aenderungsbenachrichtigung empfangen (Message Start), Kalender aktualisieren, Ressourcenplanung anpassen
+- **Datenobjekte:** Verschiebungsgrund
+- **Data Stores:** Terminkalender, Geraeteverwaltung
+
+### 05 - Patient ueberweisen
+- **Pools:** Hausarzt, Terminbuchungsplattform, Patient, Facharzt
+- **Elemente:** 4 + 12 + 4 + 3 Aktivitaeten, 3 Gateways, 7 Message Flows
+- **Hausarzt (4 Aktivitaeten):** Diagnose und Fachrichtung dokumentieren, Ueberweisungsschein erstellen, Ueberweisung im System erfassen, Statusrueckmeldung erhalten
+- **System (12 Aktivitaeten + 3 Gateways):** Ueberweisung empfangen und validieren, Fachaerzte im Umkreis suchen, Facharzt verfuegbar? (XOR: Nein -> Patient informieren, Ende), Termine laden, Patient benachrichtigen, Terminvorschlaege senden, Terminwunsch empfangen, Termin buchen, Ueberweisung verknuepfen, Parallel Gateway -> gleichzeitig: Bestaetigung an Patient, Info an Facharzt, Status an Hausarzt -> Parallel Merge
+- **Patient (4 Aktivitaeten):** Ueberweisungshinweis erhalten (Message Start), Ueberweisung einsehen, Terminvorschlaege pruefen, Termin waehlen, Bestaetigung erhalten
+- **Facharzt (3 Aktivitaeten):** Ueberweisungsdaten pruefen (Message Start), Patientenakte anlegen/aktualisieren, Termin bestaetigen
+- **Datenobjekte:** Ueberweisungsschein, Patientenakte
+- **Data Stores:** Terminkalender, Ueberweisungsdatenbank
 | 07  | Notfallpatient                         | Offen      |                                                      |
 | 08  | Apotheke suchen                        | Offen      |                                                      |
 | 09  | Post-Termin (aus Arztsicht)            | Offen      | inkl. Rezept freigeben                               |
@@ -49,14 +98,14 @@ Entwicklung einer digitalen Terminbuchungsplattform fuer Arztpraxen. Das System 
 
 | Artefakt                       | Anzahl | Erledigt | Offen |
 |--------------------------------|--------|----------|-------|
-| BPMN-Kollaborationsdiagramme   | 10     | 4        | 6     |
+| BPMN-Kollaborationsdiagramme   | 10     | 5        | 5     |
 | Use-Case-Diagramm              | 1      | 0        | 1     |
 | Klassendiagramm                | 1      | 0        | 1     |
 | Sequenzdiagramme               | 5      | 0        | 5     |
 | Projektdokumentation (20 S.)   | 1      | 0        | 1     |
 | Abschlusspraesentation         | 1      | 0        | 1     |
 | Abgabe-ZIP                     | 1      | 0        | 1     |
-| **Gesamt**                     | **20** | **4**    | **16**|
+| **Gesamt**                     | **20** | **5**    | **15**|
 
 ### 1. BPMN-Modellierung (Gewicht: 15%, gruppenbasiert)
 - 10 BPMN-Kollaborationsdiagramme, durchschnittlich je 10 Aktivitaeten
@@ -150,4 +199,6 @@ Entwicklung einer digitalen Terminbuchungsplattform fuer Arztpraxen. Das System 
 | 08.09.2026 | BPMN-Diagramm 03 (Terminbenachrichtigung) als Entwurf erstellt |
 | 08.09.2026 | Fortschritt-Gesamtuebersicht in KI_Luca.md aufgenommen |
 | 08.09.2026 | BPMN-Diagramm 04 (Termin verschieben) als Entwurf erstellt |
+| 08.09.2026 | BPMN-Diagramm 05 (Patient ueberweisen) als Entwurf erstellt |
+| 08.09.2026 | Detailaufbau aller 5 bisherigen BPMN-Diagramme in KI_Luca.md dokumentiert |
 | 01.09.2026 | Datei umbenannt von Fallstudie.md zu KI_Luca.md |
