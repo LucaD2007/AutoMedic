@@ -94,7 +94,16 @@ Entwicklung einer digitalen Terminbuchungsplattform fuer Arztpraxen. Das System 
 - **Arztpraxis (5 Aktivitaeten + 1 Gateway):** Ankunftsbenachrichtigung erhalten, Patientendaten und Termingrund einsehen, ggf. manuelle Kartenpruefung (aus System-Eskalation), Behandlungsreihenfolge festlegen, Patient aufrufen
 - **Datenobjekte:** Versichertenkarte, Wartenummer
 - **Data Stores:** Terminkalender, Patientendatenbank
-| 07  | Notfallpatient                         | Offen      |                                                      |
+
+### 07 - Notfallpatient
+- **Pools:** Patient/Begleitperson, Terminbuchungsplattform, Arztpraxis
+- **Elemente:** 5 + 11 + 7 Aktivitaeten, 4 Gateways, 6 Message Flows
+- **Patient/Begleitperson (5 Aktivitaeten):** Notfall melden (telefonisch/vor Ort/App), Symptome schildern, Sofort-Bestaetigung erhalten, Praxis aufsuchen / Einlass erhalten, Erstversorgung erhalten
+- **System (11 Aktivitaeten + 3 Gateways):** Notfallmeldung empfangen, Notfall-Triage durchfuehren (Dringlichkeitsstufe bestimmen), Sofort-Eingriff noetig? (XOR: Ja -> Arzt direkt alarmieren / Nein -> Naechsten freien Slot identifizieren), Kapazitaet vorhanden? (XOR: Nein -> Regulaeren Termin verschieben + betroffenen Patienten benachrichtigen / Ja -> Notfallslot einplanen), Notfallprotokoll anlegen (Datenobjekt), Parallel Gateway: Bestaetigung an Patient + Arztpraxis benachrichtigen, Notfall im Kalender als Prioritaet markieren
+- **Arztpraxis (7 Aktivitaeten + 1 Gateway):** Notfallalarm empfangen, Dringlichkeit pruefen, Sofort-Fall? (XOR: Ja -> Aktuelle Behandlung unterbrechen/delegieren / Nein -> Wartezimmer-Reihenfolge anpassen), Behandlungsraum vorbereiten, Notfallpatient behandeln, Behandlung dokumentieren, Notfallprotokoll abschliessen
+- **Datenobjekte:** Symptombeschreibung, Notfallprotokoll, Triage-Einstufung
+- **Data Stores:** Terminkalender, Patientendatenbank, Notfallregister
+| 07  | Notfallpatient                         | Entwurf    | 3 Pools (Patient/Begleitperson, System, Praxis). Notfall-Triage, Terminverschiebung regulaerer Patienten, Notfallprotokoll, Parallele Benachrichtigung. |
 | 08  | Apotheke suchen                        | Offen      |                                                      |
 | 09  | Post-Termin (aus Arztsicht)            | Offen      | inkl. Rezept freigeben                               |
 | 10  | (noch offen)                           | Offen      |                                                      |
@@ -107,14 +116,14 @@ Entwicklung einer digitalen Terminbuchungsplattform fuer Arztpraxen. Das System 
 
 | Artefakt                       | Anzahl | Erledigt | Offen |
 |--------------------------------|--------|----------|-------|
-| BPMN-Kollaborationsdiagramme   | 10     | 6        | 4     |
+| BPMN-Kollaborationsdiagramme   | 10     | 7        | 3     |
 | Use-Case-Diagramm              | 1      | 0        | 1     |
 | Klassendiagramm                | 1      | 0        | 1     |
 | Sequenzdiagramme               | 5      | 0        | 5     |
 | Projektdokumentation (20 S.)   | 1      | 0        | 1     |
 | Abschlusspraesentation         | 1      | 0        | 1     |
 | Abgabe-ZIP                     | 1      | 0        | 1     |
-| **Gesamt**                     | **20** | **6**    | **14**|
+| **Gesamt**                     | **20** | **7**    | **13**|
 
 ### 1. BPMN-Modellierung (Gewicht: 15%, gruppenbasiert)
 - 10 BPMN-Kollaborationsdiagramme, durchschnittlich je 10 Aktivitaeten
@@ -211,4 +220,5 @@ Entwicklung einer digitalen Terminbuchungsplattform fuer Arztpraxen. Das System 
 | 08.09.2026 | BPMN-Diagramm 05 (Patient ueberweisen) als Entwurf erstellt |
 | 08.09.2026 | Detailaufbau aller 5 bisherigen BPMN-Diagramme in KI_Luca.md dokumentiert |
 | 08.09.2026 | BPMN-Diagramm 06 (Check-In beim Arzt) als Entwurf erstellt inkl. Detailaufbau |
+| 08.09.2026 | BPMN-Diagramm 07 (Notfallpatient) als Entwurf erstellt inkl. Detailaufbau |
 | 01.09.2026 | Datei umbenannt von Fallstudie.md zu KI_Luca.md |
