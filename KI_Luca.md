@@ -26,7 +26,7 @@ Entwicklung einer digitalen Terminbuchungsplattform fuer Arztpraxen. Das System 
 
 ---
 
-## Prozesse (10 BPMN-Kollaborationsdiagramme)
+## Prozesse (10 BPMN-Kollaborationsdiagramme + 2 Reserve)
 
 | Nr. | Prozess                                | Status     | Anmerkungen                                          |
 |-----|----------------------------------------|------------|------------------------------------------------------|
@@ -121,10 +121,21 @@ Entwicklung einer digitalen Terminbuchungsplattform fuer Arztpraxen. Das System 
 - **Patient (7 Aktivitaeten + 1 Gateway):** Zusammenfassung einsehen, Digitales Rezept empfangen, Rezept pruefen und speichern, Folgetermin-Vorschlaege erhalten, Folgetermin auswaehlen und bestaetigen, Feedback-Anfrage erhalten, Feedback geben? (XOR: Ja -> Feedback verfassen und absenden / Nein -> Ende)
 - **Datenobjekte:** Diagnosebericht, Rezept
 - **Data Stores:** Patientendatenbank, Rezeptdatenbank, Terminkalender
+
+### 10 - Patientenregistrierung / Erstanmeldung
+- **Pools:** Patient, Terminbuchungsplattform, Arztpraxis
+- **Elemente:** 10 + 12 + 5 Aktivitaeten, 5 Gateways, 7 Message Flows
+- **Patient (10 Aktivitaeten + 1 Gateway):** Plattform oeffnen, Registrierungsformular aufrufen, Persoenliche Daten eingeben (Datenobjekt: Stammdaten), Versicherungsinformationen eingeben (Datenobjekt: Versicherungskarte), Datenschutzerklaerung lesen und akzeptieren, Registrierung absenden, Verifizierungs-E-Mail empfangen, Verifizierungslink anklicken, Auf Freigabe warten, Freigabe erhalten? (XOR: Ja -> Willkommensnachricht erhalten, Profil einsehen / Nein -> Hinweis auf fehlende Daten, Daten korrigieren und erneut einreichen)
+- **System (12 Aktivitaeten + 3 Gateways):** Registrierungsdaten empfangen, Pflichtfelder vollstaendig? (XOR: Nein -> Fehlermeldung an Patient, Ende / Ja -> weiter), Duplikatpruefung (Konto existiert bereits?), XOR: Ja -> Hinweis an Patient, Ende / Nein -> weiter, Benutzerkonto anlegen, Verifizierungs-E-Mail generieren und senden, Verifizierung empfangen, E-Mail-Adresse als verifiziert markieren, Versicherungsdaten zur Pruefung an Praxis weiterleiten, Freigabe von Praxis empfangen, Konto aktivieren, Willkommensnachricht an Patient senden
+- **Arztpraxis (5 Aktivitaeten + 1 Gateway):** Registrierungsanfrage empfangen, Patientendaten und Versicherung pruefen, Daten plausibel? (XOR: Ja -> Patient freigeben und Bestaetigung an System / Nein -> Ablehnungsgrund an System mit Hinweis auf fehlende/fehlerhafte Daten), Patientenakte im Praxissystem anlegen
+- **Datenobjekte:** Stammdaten, Versicherungskarte, Datenschutzerklaerung
+- **Data Stores:** Patientendatenbank, Versicherungsdatenbank
 | 07  | Notfallpatient                         | Entwurf    | 3 Pools (Patient/Begleitperson, System, Praxis). Notfall-Triage, Terminverschiebung regulaerer Patienten, Notfallprotokoll, Parallele Benachrichtigung. |
 | 08  | Apotheke suchen                        | Entwurf    | 3 Pools (Patient, System, Apotheke). Standortbasierte Suche, Medikamentenverfuegbarkeit, optionale Reservierung. |
 | 09  | Post-Termin (aus Arztsicht)            | Entwurf    | 3 Pools (Arzt, System, Patient). Behandlungsdokumentation, digitale Rezeptfreigabe, Folgetermin/Ueberweisung (3-Wege-Gateway), Feedback, Abrechnung. |
-| 10  | (noch offen)                           | Offen      |                                                      |
+| 10  | Patientenregistrierung / Erstanmeldung | Entwurf    | 3 Pools (Patient, System, Arztpraxis). Kontoerstellung, Versicherungsdaten, E-Mail-Verifizierung, Datenschutz, Praxis-Freigabe. |
+| 11  | Rezept verlaengern / Folgerezept       | Reserve    | Patient fordert Folgerezept ohne vollen Termin an, Arzt prueft und gibt frei oder lehnt ab. Pools: Patient, System, Arzt, ggf. Apotheke. |
+| 12  | Videosprechstunde buchen & durchfuehren| Reserve    | Patient bucht Videosprechstunde statt Vor-Ort-Termin, erhaelt Zugangslink, digitale Konsultation. Pools: Patient, System, Arzt. |
 
 ---
 
@@ -134,14 +145,14 @@ Entwicklung einer digitalen Terminbuchungsplattform fuer Arztpraxen. Das System 
 
 | Artefakt                       | Anzahl | Erledigt | Offen |
 |--------------------------------|--------|----------|-------|
-| BPMN-Kollaborationsdiagramme   | 10     | 9        | 1     |
+| BPMN-Kollaborationsdiagramme   | 10     | 10       | 0     |
 | Use-Case-Diagramm              | 1      | 0        | 1     |
 | Klassendiagramm                | 1      | 0        | 1     |
 | Sequenzdiagramme               | 5      | 0        | 5     |
 | Projektdokumentation (20 S.)   | 1      | 0        | 1     |
 | Abschlusspraesentation         | 1      | 0        | 1     |
 | Abgabe-ZIP                     | 1      | 0        | 1     |
-| **Gesamt**                     | **20** | **9**    | **11**|
+| **Gesamt**                     | **20** | **10**   | **10**|
 
 ### 1. BPMN-Modellierung (Gewicht: 15%, gruppenbasiert)
 - 10 BPMN-Kollaborationsdiagramme, durchschnittlich je 10 Aktivitaeten
@@ -241,4 +252,6 @@ Entwicklung einer digitalen Terminbuchungsplattform fuer Arztpraxen. Das System 
 | 08.09.2026 | BPMN-Diagramm 07 (Notfallpatient) als Entwurf erstellt inkl. Detailaufbau |
 | 08.09.2026 | BPMN-Diagramm 08 (Apotheke suchen) als Entwurf erstellt inkl. Detailaufbau |
 | 08.09.2026 | BPMN-Diagramm 09 (Post-Termin) als Entwurf erstellt inkl. Detailaufbau |
+| 08.09.2026 | Prozesse 10-12 festgelegt: 10 Patientenregistrierung, 11 Rezept verlaengern (Reserve), 12 Videosprechstunde (Reserve) |
+| 08.09.2026 | BPMN-Diagramm 10 (Patientenregistrierung) als Entwurf erstellt inkl. Detailaufbau -- Alle 10 BPMN-Diagramme fertig |
 | 01.09.2026 | Datei umbenannt von Fallstudie.md zu KI_Luca.md |
