@@ -33,7 +33,7 @@ Entwicklung einer digitalen Terminbuchungsplattform fuer Arztpraxen. Das System 
 | 01  | Termin suchen & buchen                 | Entwurf    | inkl. Notiz (Was soll gemacht werden), Geraete reservieren/entbuchen. BPMN-Diagramm erstellt (3 Pools: Patient, System, Praxis). |
 | 02  | Termin absagen                         | Entwurf    | 3 Pools (Patient, System, Praxis). Stornierungspruefung, Geraete entbuchen, Wartelisten-Nachruecker. |
 | 03  | (Regelmaessige) Terminbenachrichtigung | Entwurf    | 3 Pools (System, Patient, Praxis). Timer-Start, 3-Wege-Gateway (Bestaetigung/Absage/Keine Reaktion), Tagesbericht an Praxis. |
-| 04  | Termin verschieben                     | Offen      |                                                      |
+| 04  | Termin verschieben                     | Entwurf    | 3 Pools (Patient, System, Praxis). Fristpruefung, Alternativtermine, Geraete umbuchen, Abbruchpfad. |
 | 05  | Patient ueberweisen                    | Offen      |                                                      |
 | 06  | Check-In beim Arzt                     | Offen      |                                                      |
 | 07  | Notfallpatient                         | Offen      |                                                      |
@@ -44,6 +44,19 @@ Entwicklung einer digitalen Terminbuchungsplattform fuer Arztpraxen. Das System 
 ---
 
 ## Abgaben & Aufgaben -- Uebersicht
+
+### Fortschritt Gesamtuebersicht
+
+| Artefakt                       | Anzahl | Erledigt | Offen |
+|--------------------------------|--------|----------|-------|
+| BPMN-Kollaborationsdiagramme   | 10     | 4        | 6     |
+| Use-Case-Diagramm              | 1      | 0        | 1     |
+| Klassendiagramm                | 1      | 0        | 1     |
+| Sequenzdiagramme               | 5      | 0        | 5     |
+| Projektdokumentation (20 S.)   | 1      | 0        | 1     |
+| Abschlusspraesentation         | 1      | 0        | 1     |
+| Abgabe-ZIP                     | 1      | 0        | 1     |
+| **Gesamt**                     | **20** | **4**    | **16**|
 
 ### 1. BPMN-Modellierung (Gewicht: 15%, gruppenbasiert)
 - 10 BPMN-Kollaborationsdiagramme, durchschnittlich je 10 Aktivitaeten
@@ -135,4 +148,6 @@ Entwicklung einer digitalen Terminbuchungsplattform fuer Arztpraxen. Das System 
 | 01.09.2026 | BPMN-Diagramm 01 (Termin suchen & buchen) als Entwurf erstellt |
 | 08.09.2026 | BPMN-Diagramm 02 (Termin absagen) als Entwurf erstellt |
 | 08.09.2026 | BPMN-Diagramm 03 (Terminbenachrichtigung) als Entwurf erstellt |
+| 08.09.2026 | Fortschritt-Gesamtuebersicht in KI_Luca.md aufgenommen |
+| 08.09.2026 | BPMN-Diagramm 04 (Termin verschieben) als Entwurf erstellt |
 | 01.09.2026 | Datei umbenannt von Fallstudie.md zu KI_Luca.md |
