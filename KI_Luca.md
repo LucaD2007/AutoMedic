@@ -32,7 +32,7 @@ Entwicklung einer digitalen Terminbuchungsplattform fuer Arztpraxen. Das System 
 |-----|----------------------------------------|------------|------------------------------------------------------|
 | 01  | Termin suchen & buchen                 | Entwurf    | inkl. Notiz (Was soll gemacht werden), Geraete reservieren/entbuchen. BPMN-Diagramm erstellt (3 Pools: Patient, System, Praxis). |
 | 02  | Termin absagen                         | Entwurf    | 3 Pools (Patient, System, Praxis). Stornierungspruefung, Geraete entbuchen, Wartelisten-Nachruecker. |
-| 03  | (Regelmaessige) Terminbenachrichtigung | Offen      |                                                      |
+| 03  | (Regelmaessige) Terminbenachrichtigung | Entwurf    | 3 Pools (System, Patient, Praxis). Timer-Start, 3-Wege-Gateway (Bestaetigung/Absage/Keine Reaktion), Tagesbericht an Praxis. |
 | 04  | Termin verschieben                     | Offen      |                                                      |
 | 05  | Patient ueberweisen                    | Offen      |                                                      |
 | 06  | Check-In beim Arzt                     | Offen      |                                                      |
@@ -134,4 +134,5 @@ Entwicklung einer digitalen Terminbuchungsplattform fuer Arztpraxen. Das System 
 | 01.09.2026 | Fabian ist nicht Projektleitung -- Rolle entfernt |
 | 01.09.2026 | BPMN-Diagramm 01 (Termin suchen & buchen) als Entwurf erstellt |
 | 08.09.2026 | BPMN-Diagramm 02 (Termin absagen) als Entwurf erstellt |
+| 08.09.2026 | BPMN-Diagramm 03 (Terminbenachrichtigung) als Entwurf erstellt |
 | 01.09.2026 | Datei umbenannt von Fallstudie.md zu KI_Luca.md |
