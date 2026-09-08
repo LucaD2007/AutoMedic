@@ -35,7 +35,7 @@ Entwicklung einer digitalen Terminbuchungsplattform fuer Arztpraxen. Das System 
 | 03  | (Regelmaessige) Terminbenachrichtigung | Entwurf    | 3 Pools (System, Patient, Praxis). Timer-Start, 3-Wege-Gateway (Bestaetigung/Absage/Keine Reaktion), Tagesbericht an Praxis. |
 | 04  | Termin verschieben                     | Entwurf    | 3 Pools (Patient, System, Praxis). Fristpruefung, Alternativtermine, Geraete umbuchen, Abbruchpfad. |
 | 05  | Patient ueberweisen                    | Entwurf    | 4 Pools (Hausarzt, System, Patient, Facharzt). Facharztsuche, Parallele Benachrichtigung (Parallel Gateway), Ueberweisungsdatenbank. |
-| 06  | Check-In beim Arzt                     | Offen      |                                                      |
+| 06  | Check-In beim Arzt                     | Entwurf    | 3 Pools (Patient, System, Praxis). Digitaler Check-In, Versichertenkartenpruefung, Wartezimmermanagement, Notfallpriorisierung. |
 
 ---
 
@@ -85,6 +85,15 @@ Entwicklung einer digitalen Terminbuchungsplattform fuer Arztpraxen. Das System 
 - **Facharzt (3 Aktivitaeten):** Ueberweisungsdaten pruefen (Message Start), Patientenakte anlegen/aktualisieren, Termin bestaetigen
 - **Datenobjekte:** Ueberweisungsschein, Patientenakte
 - **Data Stores:** Terminkalender, Ueberweisungsdatenbank
+
+### 06 - Check-In beim Arzt
+- **Pools:** Patient, Terminbuchungsplattform, Arztpraxis
+- **Elemente:** 6 + 10 + 5 Aktivitaeten, 4 Gateways, 6 Message Flows
+- **Patient (6 Aktivitaeten):** In der Praxis eintreffen, Check-In am Terminal/App starten, Versichertenkarte einlesen, Check-In-Bestaetigung und Wartenummer erhalten, geschaetzte Wartezeit einsehen, Aufruf erhalten und zum Behandlungszimmer gehen
+- **System (10 Aktivitaeten + 4 Gateways):** Check-In-Anfrage empfangen, Termin fuer heute vorhanden? (XOR: Nein -> Spontanbesuch erfassen), Versichertendaten pruefen, Daten gueltig? (XOR: Nein -> Manuelle Pruefung an Praxis), Patient als anwesend markieren, Warteposition berechnen, Notfall? (XOR: Ja -> Prioritaet hochsetzen), Wartenummer und Wartezeit an Patient senden, Praxis ueber Ankunft benachrichtigen, Aufruf-Signal an Patient weiterleiten
+- **Arztpraxis (5 Aktivitaeten + 1 Gateway):** Ankunftsbenachrichtigung erhalten, Patientendaten und Termingrund einsehen, ggf. manuelle Kartenpruefung (aus System-Eskalation), Behandlungsreihenfolge festlegen, Patient aufrufen
+- **Datenobjekte:** Versichertenkarte, Wartenummer
+- **Data Stores:** Terminkalender, Patientendatenbank
 | 07  | Notfallpatient                         | Offen      |                                                      |
 | 08  | Apotheke suchen                        | Offen      |                                                      |
 | 09  | Post-Termin (aus Arztsicht)            | Offen      | inkl. Rezept freigeben                               |
@@ -98,14 +107,14 @@ Entwicklung einer digitalen Terminbuchungsplattform fuer Arztpraxen. Das System 
 
 | Artefakt                       | Anzahl | Erledigt | Offen |
 |--------------------------------|--------|----------|-------|
-| BPMN-Kollaborationsdiagramme   | 10     | 5        | 5     |
+| BPMN-Kollaborationsdiagramme   | 10     | 6        | 4     |
 | Use-Case-Diagramm              | 1      | 0        | 1     |
 | Klassendiagramm                | 1      | 0        | 1     |
 | Sequenzdiagramme               | 5      | 0        | 5     |
 | Projektdokumentation (20 S.)   | 1      | 0        | 1     |
 | Abschlusspraesentation         | 1      | 0        | 1     |
 | Abgabe-ZIP                     | 1      | 0        | 1     |
-| **Gesamt**                     | **20** | **5**    | **15**|
+| **Gesamt**                     | **20** | **6**    | **14**|
 
 ### 1. BPMN-Modellierung (Gewicht: 15%, gruppenbasiert)
 - 10 BPMN-Kollaborationsdiagramme, durchschnittlich je 10 Aktivitaeten
@@ -201,4 +210,5 @@ Entwicklung einer digitalen Terminbuchungsplattform fuer Arztpraxen. Das System 
 | 08.09.2026 | BPMN-Diagramm 04 (Termin verschieben) als Entwurf erstellt |
 | 08.09.2026 | BPMN-Diagramm 05 (Patient ueberweisen) als Entwurf erstellt |
 | 08.09.2026 | Detailaufbau aller 5 bisherigen BPMN-Diagramme in KI_Luca.md dokumentiert |
+| 08.09.2026 | BPMN-Diagramm 06 (Check-In beim Arzt) als Entwurf erstellt inkl. Detailaufbau |
 | 01.09.2026 | Datei umbenannt von Fallstudie.md zu KI_Luca.md |
