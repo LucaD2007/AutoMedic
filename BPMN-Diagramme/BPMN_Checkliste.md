@@ -1,21 +1,22 @@
 # BPMN-Pruefcheckliste
 
 Systematische Checkliste zur Pruefung und Verbesserung aller BPMN-Diagramme.
-Quellen: Vorlesung "GP-Orientierte Analyse" (Folien 04/04.02), "Diagrammtechniken" (Folie 03), Aufgabenstellung Fallstudie.
+Quellen: Vorlesung "GP-Orientierte Analyse" (Folien 04/04.02), "Diagrammtechniken" (Folie 03), Aufgabenstellung Fallstudie, Betreuer-Feedback (08.09.2026).
 
 ---
 
-## A. Strukturelle Anforderungen (Aufgabenstellung)
+## A. Strukturelle Anforderungen (Aufgabenstellung + Betreuer-Feedback)
 
 - [ ] Diagramm ist ein **Kollaborationsdiagramm** (mehrere Pools)
-- [ ] Durchschnittlich **ca. 10 Aktivitaeten** pro Diagramm
+- [ ] **Ca. 10 Aktivitaeten (+/- 2)** im gesamten Diagramm (ueber alle Pools) -- Richtwert vom Betreuer
 - [ ] **Lanes/Pools** sind vorhanden und sinnvoll eingesetzt
 - [ ] **Datenobjekte** (Einzelobjekte) und/oder **Datenspeicher** (Objektmengen) sind modelliert
 - [ ] Dateiname folgt Schema: `XX-PraegnanterName` (z.B. `01-TerminSuchenBuchen`)
 - [ ] Diagramm oeffnet fehlerfrei in **Camunda Modeler** oder **bpmn.io**
 - [ ] Syntaktisch korrektes **BPMN 2.0** XML-Format
+- [ ] Diagramm funktioniert als **Onboarding-Dokument** -- ein neuer Mitarbeiter versteht den Prozess auf den ersten Blick
 
-## B. Aktivitaeten (Folien 4-17 bis 4-22)
+## B. Aktivitaeten (Folien 4-17 bis 4-22 + Betreuer-Feedback)
 
 - [ ] **Benennung einheitlich im Infinitiv + Objekt** (z.B. "Termin buchen", "Rezept freigeben" -- NICHT "Termin gebucht" oder "Buchung")
 - [ ] **Aktivitaetstypen** korrekt verwendet:
@@ -29,6 +30,12 @@ Quellen: Vorlesung "GP-Orientierte Analyse" (Folien 04/04.02), "Diagrammtechnike
   - Manuelle Aktivitaet: von einer Person, ohne Ortswechsel ausfuehrbar
   - Automatisierte Aktivitaet: ohne Wechsel des Anwendungssystems ausfuehrbar
   - Nicht zu grob (z.B. "System verwalten") und nicht zu fein (z.B. "Button klicken")
+- [ ] **Aufeinanderfolgende einfache Activities zusammengefasst**, wenn:
+  - Gleiche Person/Rolle fuehrt sie aus
+  - Kein Ortswechsel und kein Systemwechsel dazwischen
+  - Keine Entscheidung (Gateway) dazwischen noetig
+  - Schritte treten immer gemeinsam und in fester Reihenfolge auf
+  - Beispiel: "Plattform aufrufen" + "Fachrichtung waehlen" + "Termine suchen" -> "Termin suchen und auswaehlen"
 
 ## C. Ereignisse / Events (Folien 4-24 bis 4-29)
 
@@ -85,12 +92,16 @@ Quellen: Vorlesung "GP-Orientierte Analyse" (Folien 04/04.02), "Diagrammtechnike
 - [ ] Keine "toten Enden" (jede Aktivitaet hat ein- und ausgehende Kanten, ausser Start/Ende)
 - [ ] Keine unerreichbaren Elemente
 
-## I. Subprozesse und Schleifen (Folien 4-37 bis 4-43)
+## I. Subprozesse und Schleifen (Folien 4-37 bis 4-43 + Betreuer-Feedback)
 
-- [ ] **Lokale Subprozesse** fuer Verfeinerung komplexer Aktivitaeten genutzt (wo sinnvoll)
+- [ ] **Details ueber Subprozesse abstrahieren** -- Hauptebene zeigt nur den uebergeordneten Ablauf
+- [ ] **Lokale Subprozesse** (collapsed, mit + Marker) fuer Gruppen von 3-5 zusammenhaengenden Activities
+  - Beispiel: "Buchung verarbeiten" als Subprozess fuer Termin reservieren + Geraete pruefen + Notiz speichern
 - [ ] **Call Activities** (globale Subprozesse) fuer wiederverwendbare Prozesse ueber Diagramme hinweg
 - [ ] **Schleifen** (Loop) fuer iterative Aktivitaeten eingesetzt
 - [ ] **Multi-Instanzen** (sequentiell/parallel) wo mehrere gleichartige Instanzen noetig
+- [ ] **Fehler-/Sonderpfade** in Subprozesse verlagert oder ueber Error-Boundary-Events am Subprozess dargestellt
+- [ ] Hauptebene zeigt primaer den **Happy Path** (Normalfall) -- Sonderfaelle stecken in Subprozessen
 
 ## J. Qualitaet und Konsistenz (uebergreifend)
 
@@ -100,3 +111,17 @@ Quellen: Vorlesung "GP-Orientierte Analyse" (Folien 04/04.02), "Diagrammtechnike
 - [ ] **Automatisierungspotenzial** ist erkennbar (welche Schritte kann Software uebernehmen?)
 - [ ] Konsistenz zwischen Diagrammen (z.B. gleiche Pool-Namen, gleiche Datenspeicher-Bezeichnungen)
 - [ ] Keine redundanten Aktivitaeten oder ueberfluessigen Elemente
+
+---
+
+## Kurzanleitung: Groesse reduzieren (Betreuer-Feedback)
+
+Fuer jedes Diagramm diese Schritte durchgehen:
+
+1. **Zaehlen**: Wie viele Activities hat das Diagramm aktuell (ueber alle Pools)?
+2. **Happy Path markieren**: Welche Activities gehoeren zum Normalfall?
+3. **Zusammenfassen**: Aufeinanderfolgende Activities gleicher Person/gleiches System ohne Gateway dazwischen buendeln
+4. **Subprozesse bilden**: Restliche Gruppen von 3-5 Activities als Subprozess kapseln (collapsed, + Marker)
+5. **Sonderpfade kuerzen**: Gateways fuer Ausnahmefaelle in Subprozesse verlagern oder als Boundary-Event darstellen
+6. **Zaehlen**: Ziel **8-12 Activities** auf der Hauptebene
+7. **Onboarding-Test**: Wuerde ein neuer Mitarbeiter den Prozess auf den ersten Blick verstehen?
