@@ -140,12 +140,21 @@ Entwicklung einer digitalen Terminbuchungsplattform fuer Arztpraxen. Das System 
 - **Apotheke (5 Aktivitaeten + 1 Gateway):** Rezept empfangen, Rezept auf Gueltigkeit pruefen, Medikament verfuegbar? (XOR: Ja -> Medikament reservieren + Abholbereitschaft melden / Nein -> Alternative vorschlagen + Rueckmeldung an System)
 - **Datenobjekte:** Patientennotiz, Signiertes Rezept
 - **Data Stores:** Rezeptdatenbank, Patientendatenbank, Medikamentenbestand
+
+### 12 - Videosprechstunde buchen & durchfuehren (Reserve)
+- **Pools:** Patient, Terminbuchungsplattform, Arzt
+- **Elemente:** 11 + 14 + 8 Aktivitaeten, 6 Gateways, 9 Message Flows
+- **Patient (11 Aktivitaeten + 2 Gateways):** Plattform oeffnen, Terminart "Videosprechstunde" auswaehlen, Fachrichtung/Arzt waehlen, verfuegbare Video-Slots einsehen, Termin auswaehlen, Symptome/Anliegen beschreiben (Datenobjekt: Anliegenbeschreibung), Buchung absenden, Bestaetigungsmail mit Zugangslink erhalten, Vor Termin: Technikcheck starten (Kamera/Mikrofon), Technik OK? (XOR: Nein -> Fehlerbehebungshinweise erhalten, erneut pruefen / Ja -> weiter), Videositzung beitreten, Konsultation durchfuehren, Zusammenfassung und ggf. Dokumente empfangen, Feedback geben? (XOR: Ja -> Feedback verfassen / Nein -> Ende)
+- **System (14 Aktivitaeten + 3 Gateways):** Buchungsanfrage empfangen, Video-Slot verfuegbar? (XOR: Nein -> Alternativtermine vorschlagen / Ja -> weiter), Termin reservieren, Videoraum-ID generieren, Bestaetigung mit Zugangslink an Patient senden, Arzt ueber Termin benachrichtigen, Zum Terminzeitpunkt: Technikcheck-Anfrage an Patient senden, Ergebnis empfangen, Beiden Teilnehmern Beitritt ermoeglichen, Videositzung starten und ueberwachen, Verbindungsproblem? (XOR: Ja -> Automatische Wiederverbindung versuchen / Nein -> weiter), Sitzungsende registrieren, Nachbereitung vom Arzt empfangen, Dokumente an Patient senden, Feedback-Anfrage senden, Feedback speichern
+- **Arzt (8 Aktivitaeten + 1 Gateway):** Terminbenachrichtigung erhalten, Patientenakte und Anliegenbeschreibung einsehen, Videositzung beitreten, Konsultation durchfuehren, Befund dokumentieren (Datenobjekt: Befundbericht), Folgedokumente noetig? (XOR: Rezept -> Rezept digital ausstellen / Ueberweisung -> Ueberweisung erstellen / Krankschreibung -> AU-Bescheinigung erstellen / Keine -> weiter), Dokumente an System uebermitteln, Sitzung beenden
+- **Datenobjekte:** Anliegenbeschreibung, Zugangslink, Befundbericht, Rezept/Ueberweisung/AU
+- **Data Stores:** Terminkalender, Patientendatenbank, Videositzungsprotokoll
 | 07  | Notfallpatient                         | Entwurf    | 3 Pools (Patient/Begleitperson, System, Praxis). Notfall-Triage, Terminverschiebung regulaerer Patienten, Notfallprotokoll, Parallele Benachrichtigung. |
 | 08  | Apotheke suchen                        | Entwurf    | 3 Pools (Patient, System, Apotheke). Standortbasierte Suche, Medikamentenverfuegbarkeit, optionale Reservierung. |
 | 09  | Post-Termin (aus Arztsicht)            | Entwurf    | 3 Pools (Arzt, System, Patient). Behandlungsdokumentation, digitale Rezeptfreigabe, Folgetermin/Ueberweisung (3-Wege-Gateway), Feedback, Abrechnung. |
 | 10  | Patientenregistrierung / Erstanmeldung | Entwurf    | 3 Pools (Patient, System, Arztpraxis). Kontoerstellung, Versicherungsdaten, E-Mail-Verifizierung, Datenschutz, Praxis-Freigabe. |
 | 11  | Rezept verlaengern / Folgerezept       | Entwurf    | 4 Pools (Patient, System, Arzt, Apotheke). Folgerezeptanforderung ohne Termin, Arztpruefung, digitale Signatur, optionale Apothekenweiterleitung. |
-| 12  | Videosprechstunde buchen & durchfuehren| Reserve    | Patient bucht Videosprechstunde statt Vor-Ort-Termin, erhaelt Zugangslink, digitale Konsultation. Pools: Patient, System, Arzt. |
+| 12  | Videosprechstunde buchen & durchfuehren| Entwurf    | 3 Pools (Patient, System, Arzt). Online-Terminbuchung, Technikcheck, Videositzung, digitale Nachbereitung (Rezept/Ueberweisung/Krankschreibung). |
 
 ---
 
@@ -265,4 +274,5 @@ Entwicklung einer digitalen Terminbuchungsplattform fuer Arztpraxen. Das System 
 | 08.09.2026 | Prozesse 10-12 festgelegt: 10 Patientenregistrierung, 11 Rezept verlaengern (Reserve), 12 Videosprechstunde (Reserve) |
 | 08.09.2026 | BPMN-Diagramm 10 (Patientenregistrierung) als Entwurf erstellt inkl. Detailaufbau -- Alle 10 BPMN-Diagramme fertig |
 | 08.09.2026 | BPMN-Diagramm 11 (Rezept verlaengern) als Reserve-Entwurf erstellt inkl. Detailaufbau |
+| 08.09.2026 | BPMN-Diagramm 12 (Videosprechstunde) als Reserve-Entwurf erstellt inkl. Detailaufbau -- Alle 12 BPMN-Diagramme fertig |
 | 01.09.2026 | Datei umbenannt von Fallstudie.md zu KI_Luca.md |
