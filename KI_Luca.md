@@ -31,7 +31,7 @@ Entwicklung einer digitalen Terminbuchungsplattform fuer Arztpraxen. Das System 
 | Nr. | Prozess                                | Status     | Anmerkungen                                          |
 |-----|----------------------------------------|------------|------------------------------------------------------|
 | 01  | Termin suchen & buchen                 | Entwurf    | inkl. Notiz (Was soll gemacht werden), Geraete reservieren/entbuchen. BPMN-Diagramm erstellt (3 Pools: Patient, System, Praxis). |
-| 02  | Termin absagen                         | Offen      |                                                      |
+| 02  | Termin absagen                         | Entwurf    | 3 Pools (Patient, System, Praxis). Stornierungspruefung, Geraete entbuchen, Wartelisten-Nachruecker. |
 | 03  | (Regelmaessige) Terminbenachrichtigung | Offen      |                                                      |
 | 04  | Termin verschieben                     | Offen      |                                                      |
 | 05  | Patient ueberweisen                    | Offen      |                                                      |
@@ -133,3 +133,5 @@ Entwicklung einer digitalen Terminbuchungsplattform fuer Arztpraxen. Das System 
 | 01.09.2026 | Rollenverteilung korrigiert: fachliche Zuordnungen aus Pitch entfernt, aktuelle Rollen eingetragen (Luca: Scrum Master, Niha: KI-Manager) |
 | 01.09.2026 | Fabian ist nicht Projektleitung -- Rolle entfernt |
 | 01.09.2026 | BPMN-Diagramm 01 (Termin suchen & buchen) als Entwurf erstellt |
+| 08.09.2026 | BPMN-Diagramm 02 (Termin absagen) als Entwurf erstellt |
+| 01.09.2026 | Datei umbenannt von Fallstudie.md zu KI_Luca.md |
