@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                  id="Definitions_02"
+                  targetNamespace="http://bpmn.io/schema/bpmn"
+                  exporter="EKX DeepAgent"
+                  exporterVersion="3.0">
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!--  COLLABORATION                                         -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <bpmn:collaboration id="Collab_02">
+    <bpmn:participant id="Pool_Patient" name="Patient" processRef="Proc_Patient" />
+    <bpmn:participant id="Pool_System" name="Terminbuchungsplattform" processRef="Proc_System" />
+    <bpmn:participant id="Pool_Praxis" name="Arztpraxis" processRef="Proc_Praxis" />
+
+    <bpmn:messageFlow id="MF01" name="Absageanfrage"
+        sourceRef="T_P_AbsageSenden" targetRef="Start_System" />
+    <bpmn:messageFlow id="MF02" name="Absagebestaetigung"
+        sourceRef="T_S_BestaetigungSenden" targetRef="ICE_P_Bestaetigung" />
+    <bpmn:messageFlow id="MF03" name="Absagebenachrichtigung"
+        sourceRef="T_S_PraxisBenachrichtigen" targetRef="Start_Praxis" />
+  </bpmn:collaboration>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!--  PATIENT  (2 Aktivitaeten + 1 Zwischenereignis)        -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <bpmn:process id="Proc_Patient" isExecutable="false">
+
+    <bpmn:startEvent id="Start_Patient" name="Terminabsage gewuenscht">
+      <bpmn:outgoing>F_P1</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <bpmn:userTask id="T_P_TerminWaehlen" name="Termin zur Absage auswaehlen">
+      <bpmn:incoming>F_P1</bpmn:incoming>
+      <bpmn:outgoing>F_P2</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:sendTask id="T_P_AbsageSenden" name="Absage bestaetigen und senden">
+      <bpmn:incoming>F_P2</bpmn:incoming>
+      <bpmn:outgoing>F_P3</bpmn:outgoing>
+      <bpmn:property id="Prop_P_Grund" name="__targetRef_placeholder" />
+      <bpmn:dataInputAssociation id="DIA_P1">
+        <bpmn:sourceRef>DOR_Absagegrund</bpmn:sourceRef>
+        <bpmn:targetRef>Prop_P_Grund</bpmn:targetRef>
+      </bpmn:dataInputAssociation>
+    </bpmn:sendTask>
+
+    <bpmn:intermediateCatchEvent id="ICE_P_Bestaetigung" name="Absagebestaetigung erhalten">
+      <bpmn:incoming>F_P3</bpmn:incoming>
+      <bpmn:outgoing>F_P4</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MED_ICE_P" />
+    </bpmn:intermediateCatchEvent>
+
+    <bpmn:endEvent id="End_Patient" name="Termin abgesagt">
+      <bpmn:incoming>F_P4</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <bpmn:dataObjectReference id="DOR_Absagegrund" name="Absagegrund" dataObjectRef="DO_Absagegrund" />
+    <bpmn:dataObject id="DO_Absagegrund" />
+
+    <bpmn:sequenceFlow id="F_P1" sourceRef="Start_Patient"       targetRef="T_P_TerminWaehlen" />
+    <bpmn:sequenceFlow id="F_P2" sourceRef="T_P_TerminWaehlen"   targetRef="T_P_AbsageSenden" />
+    <bpmn:sequenceFlow id="F_P3" sourceRef="T_P_AbsageSenden"    targetRef="ICE_P_Bestaetigung" />
+    <bpmn:sequenceFlow id="F_P4" sourceRef="ICE_P_Bestaetigung"  targetRef="End_Patient" />
+  </bpmn:process>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!--  SYSTEM  (1 serviceTask + 1 subProcess + 2 sendTasks)  -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <bpmn:process id="Proc_System" isExecutable="false">
+
+    <bpmn:startEvent id="Start_System" name="Absageanfrage eingetroffen">
+      <bpmn:outgoing>F_S1</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MED_Start_S" />
+    </bpmn:startEvent>
+
+    <bpmn:serviceTask id="T_S_TerminPruefen" name="Termin identifizieren und Stornierbarkeit pruefen">
+      <bpmn:incoming>F_S1</bpmn:incoming>
+      <bpmn:outgoing>F_S2</bpmn:outgoing>
+      <bpmn:property id="Prop_S_Kal" name="__targetRef_placeholder" />
+      <bpmn:dataInputAssociation id="DIA_S1">
+        <bpmn:sourceRef>DSR_Terminkalender</bpmn:sourceRef>
+        <bpmn:targetRef>Prop_S_Kal</bpmn:targetRef>
+      </bpmn:dataInputAssociation>
+    </bpmn:serviceTask>
+
+    <bpmn:exclusiveGateway id="GW_S_Stornierbar" name="Stornierung moeglich?">
+      <bpmn:incoming>F_S2</bpmn:incoming>
+      <bpmn:outgoing>F_S3_Ja</bpmn:outgoing>
+      <bpmn:outgoing>F_S3_Nein</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <!-- collapsed sub-process (+ marker) -->
+    <bpmn:subProcess id="SP_Stornierung" name="Stornierung durchfuehren" triggeredByEvent="false">
+      <bpmn:incoming>F_S3_Ja</bpmn:incoming>
+      <bpmn:outgoing>F_S4</bpmn:outgoing>
+
+      <bpmn:dataOutputAssociation id="DOA_SP1">
+        <bpmn:targetRef>DSR_Terminkalender</bpmn:targetRef>
+      </bpmn:dataOutputAssociation>
+      <bpmn:dataOutputAssociation id="DOA_SP2">
+        <bpmn:targetRef>DSR_Geraete</bpmn:targetRef>
+      </bpmn:dataOutputAssociation>
+
+      <!-- ── internal elements (hidden when collapsed) ── -->
+      <bpmn:startEvent id="SP_Start"><bpmn:outgoing>SP_F1</bpmn:outgoing></bpmn:startEvent>
+      <bpmn:serviceTask id="SP_Stornieren" name="Terminbuchung stornieren">
+        <bpmn:incoming>SP_F1</bpmn:incoming><bpmn:outgoing>SP_F2</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:serviceTask id="SP_SlotFreigeben" name="Zeitslot im Kalender freigeben">
+        <bpmn:incoming>SP_F2</bpmn:incoming><bpmn:outgoing>SP_F3</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:exclusiveGateway id="SP_GW_Geraete" name="Geraete reserviert?">
+        <bpmn:incoming>SP_F3</bpmn:incoming>
+        <bpmn:outgoing>SP_F4a</bpmn:outgoing><bpmn:outgoing>SP_F4b</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:serviceTask id="SP_GeraeteFreigeben" name="Geraetereservierung aufheben">
+        <bpmn:incoming>SP_F4a</bpmn:incoming><bpmn:outgoing>SP_F5</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:exclusiveGateway id="SP_GW_Merge">
+        <bpmn:incoming>SP_F5</bpmn:incoming><bpmn:incoming>SP_F4b</bpmn:incoming>
+        <bpmn:outgoing>SP_F6</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:endEvent id="SP_End"><bpmn:incoming>SP_F6</bpmn:incoming></bpmn:endEvent>
+      <bpmn:sequenceFlow id="SP_F1"  sourceRef="SP_Start"          targetRef="SP_Stornieren" />
+      <bpmn:sequenceFlow id="SP_F2"  sourceRef="SP_Stornieren"     targetRef="SP_SlotFreigeben" />
+      <bpmn:sequenceFlow id="SP_F3"  sourceRef="SP_SlotFreigeben"  targetRef="SP_GW_Geraete" />
+      <bpmn:sequenceFlow id="SP_F4a" name="Ja"  sourceRef="SP_GW_Geraete" targetRef="SP_GeraeteFreigeben" />
+      <bpmn:sequenceFlow id="SP_F4b" name="Nein" sourceRef="SP_GW_Geraete" targetRef="SP_GW_Merge" />
+      <bpmn:sequenceFlow id="SP_F5"  sourceRef="SP_GeraeteFreigeben" targetRef="SP_GW_Merge" />
+      <bpmn:sequenceFlow id="SP_F6"  sourceRef="SP_GW_Merge"       targetRef="SP_End" />
+    </bpmn:subProcess>
+
+    <bpmn:sendTask id="T_S_BestaetigungSenden" name="Absagebestaetigung an Patient senden">
+      <bpmn:incoming>F_S4</bpmn:incoming>
+      <bpmn:outgoing>F_S5</bpmn:outgoing>
+    </bpmn:sendTask>
+
+    <bpmn:sendTask id="T_S_PraxisBenachrichtigen" name="Praxis ueber Absage benachrichtigen">
+      <bpmn:incoming>F_S5</bpmn:incoming>
+      <bpmn:outgoing>F_S6</bpmn:outgoing>
+    </bpmn:sendTask>
+
+    <bpmn:endEvent id="End_System" name="Stornierung abgeschlossen">
+      <bpmn:incoming>F_S6</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <bpmn:endEvent id="End_System_Abbruch" name="Stornierung abgelehnt">
+      <bpmn:incoming>F_S3_Nein</bpmn:incoming>
+      <bpmn:messageEventDefinition id="MED_Abbruch" />
+    </bpmn:endEvent>
+
+    <bpmn:dataStoreReference id="DSR_Terminkalender" name="Terminkalender" />
+    <bpmn:dataStoreReference id="DSR_Geraete" name="Geraeteverwaltung" />
+
+    <bpmn:sequenceFlow id="F_S1"      sourceRef="Start_System"            targetRef="T_S_TerminPruefen" />
+    <bpmn:sequenceFlow id="F_S2"      sourceRef="T_S_TerminPruefen"       targetRef="GW_S_Stornierbar" />
+    <bpmn:sequenceFlow id="F_S3_Ja"   name="Ja"   sourceRef="GW_S_Stornierbar" targetRef="SP_Stornierung" />
+    <bpmn:sequenceFlow id="F_S3_Nein" name="Nein" sourceRef="GW_S_Stornierbar" targetRef="End_System_Abbruch" />
+    <bpmn:sequenceFlow id="F_S4"      sourceRef="SP_Stornierung"          targetRef="T_S_BestaetigungSenden" />
+    <bpmn:sequenceFlow id="F_S5"      sourceRef="T_S_BestaetigungSenden"  targetRef="T_S_PraxisBenachrichtigen" />
+    <bpmn:sequenceFlow id="F_S6"      sourceRef="T_S_PraxisBenachrichtigen" targetRef="End_System" />
+  </bpmn:process>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!--  ARZTPRAXIS  (2 Aktivitaeten)                          -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <bpmn:process id="Proc_Praxis" isExecutable="false">
+
+    <bpmn:startEvent id="Start_Praxis" name="Absagebenachrichtigung erhalten">
+      <bpmn:outgoing>F_Pr1</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MED_Start_Pr" />
+    </bpmn:startEvent>
+
+    <bpmn:userTask id="T_Pr_PruefenAktualisieren" name="Absage pruefen und Kalender aktualisieren">
+      <bpmn:incoming>F_Pr1</bpmn:incoming>
+      <bpmn:outgoing>F_Pr2</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:exclusiveGateway id="GW_Pr_Warteliste" name="Patienten auf Warteliste?">
+      <bpmn:incoming>F_Pr2</bpmn:incoming>
+      <bpmn:outgoing>F_Pr3_Ja</bpmn:outgoing>
+      <bpmn:outgoing>F_Pr3_Nein</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:userTask id="T_Pr_Nachruecker" name="Nachruecker ueber freien Slot informieren">
+      <bpmn:incoming>F_Pr3_Ja</bpmn:incoming>
+      <bpmn:outgoing>F_Pr4</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:exclusiveGateway id="GW_Pr_Merge">
+      <bpmn:incoming>F_Pr4</bpmn:incoming>
+      <bpmn:incoming>F_Pr3_Nein</bpmn:incoming>
+      <bpmn:outgoing>F_Pr5</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:endEvent id="End_Praxis" name="Absage verarbeitet">
+      <bpmn:incoming>F_Pr5</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <bpmn:sequenceFlow id="F_Pr1"      sourceRef="Start_Praxis"           targetRef="T_Pr_PruefenAktualisieren" />
+    <bpmn:sequenceFlow id="F_Pr2"      sourceRef="T_Pr_PruefenAktualisieren" targetRef="GW_Pr_Warteliste" />
+    <bpmn:sequenceFlow id="F_Pr3_Ja"   name="Ja"   sourceRef="GW_Pr_Warteliste" targetRef="T_Pr_Nachruecker" />
+    <bpmn:sequenceFlow id="F_Pr3_Nein" name="Nein" sourceRef="GW_Pr_Warteliste" targetRef="GW_Pr_Merge" />
+    <bpmn:sequenceFlow id="F_Pr4"      sourceRef="T_Pr_Nachruecker"       targetRef="GW_Pr_Merge" />
+    <bpmn:sequenceFlow id="F_Pr5"      sourceRef="GW_Pr_Merge"            targetRef="End_Praxis" />
+  </bpmn:process>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!--  DI  (diagram layout for Camunda Modeler / bpmn.io)    -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <bpmndi:BPMNDiagram id="Diagram_02">
+    <bpmndi:BPMNPlane id="Plane_02" bpmnElement="Collab_02">
+
+      <!-- ── Patient Pool  y=60  h=180 ── -->
+      <bpmndi:BPMNShape id="S_Pool_Patient" bpmnElement="Pool_Patient" isHorizontal="true">
+        <dc:Bounds x="160" y="60" width="900" height="180" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_StartP" bpmnElement="Start_Patient">
+        <dc:Bounds x="232" y="132" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_T_P1" bpmnElement="T_P_TerminWaehlen">
+        <dc:Bounds x="320" y="110" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_T_P2" bpmnElement="T_P_AbsageSenden">
+        <dc:Bounds x="480" y="110" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_DOR" bpmnElement="DOR_Absagegrund">
+        <dc:Bounds x="502" y="66" width="36" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_ICE_P" bpmnElement="ICE_P_Bestaetigung">
+        <dc:Bounds x="652" y="132" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_EndP" bpmnElement="End_Patient">
+        <dc:Bounds x="752" y="132" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNEdge id="E_P1" bpmnElement="F_P1">
+        <di:waypoint x="268" y="150" /><di:waypoint x="320" y="150" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_P2" bpmnElement="F_P2">
+        <di:waypoint x="420" y="150" /><di:waypoint x="480" y="150" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_P3" bpmnElement="F_P3">
+        <di:waypoint x="580" y="150" /><di:waypoint x="652" y="150" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_P4" bpmnElement="F_P4">
+        <di:waypoint x="688" y="150" /><di:waypoint x="752" y="150" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_DIA_P1" bpmnElement="DIA_P1">
+        <di:waypoint x="520" y="116" /><di:waypoint x="520" y="110" />
+      </bpmndi:BPMNEdge>
+
+      <!-- ── System Pool  y=300  h=260 ── -->
+      <bpmndi:BPMNShape id="S_Pool_System" bpmnElement="Pool_System" isHorizontal="true">
+        <dc:Bounds x="160" y="300" width="900" height="260" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_StartS" bpmnElement="Start_System">
+        <dc:Bounds x="232" y="412" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_T_S1" bpmnElement="T_S_TerminPruefen">
+        <dc:Bounds x="320" y="390" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_GW_Stornierbar" bpmnElement="GW_S_Stornierbar" isMarkerVisible="true">
+        <dc:Bounds x="465" y="405" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_EndAbbruch" bpmnElement="End_System_Abbruch">
+        <dc:Bounds x="472" y="502" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_SP" bpmnElement="SP_Stornierung" isExpanded="false">
+        <dc:Bounds x="560" y="390" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_T_S3" bpmnElement="T_S_BestaetigungSenden">
+        <dc:Bounds x="730" y="390" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_T_S4" bpmnElement="T_S_PraxisBenachrichtigen">
+        <dc:Bounds x="880" y="390" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_EndS" bpmnElement="End_System">
+        <dc:Bounds x="1012" y="412" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <!-- Data Stores -->
+      <bpmndi:BPMNShape id="S_DS_TK" bpmnElement="DSR_Terminkalender">
+        <dc:Bounds x="345" y="502" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_DS_GV" bpmnElement="DSR_Geraete">
+        <dc:Bounds x="595" y="502" width="50" height="50" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNEdge id="E_S1" bpmnElement="F_S1">
+        <di:waypoint x="268" y="430" /><di:waypoint x="320" y="430" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_S2" bpmnElement="F_S2">
+        <di:waypoint x="420" y="430" /><di:waypoint x="465" y="430" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_S3Ja" bpmnElement="F_S3_Ja">
+        <di:waypoint x="515" y="430" /><di:waypoint x="560" y="430" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_S3Nein" bpmnElement="F_S3_Nein">
+        <di:waypoint x="490" y="455" /><di:waypoint x="490" y="502" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_S4" bpmnElement="F_S4">
+        <di:waypoint x="680" y="430" /><di:waypoint x="730" y="430" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_S5" bpmnElement="F_S5">
+        <di:waypoint x="830" y="430" /><di:waypoint x="880" y="430" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_S6" bpmnElement="F_S6">
+        <di:waypoint x="980" y="430" /><di:waypoint x="1012" y="430" />
+      </bpmndi:BPMNEdge>
+      <!-- data assoc -->
+      <bpmndi:BPMNEdge id="E_DIA_S1" bpmnElement="DIA_S1">
+        <di:waypoint x="370" y="502" /><di:waypoint x="370" y="470" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_DOA_SP1" bpmnElement="DOA_SP1">
+        <di:waypoint x="600" y="470" /><di:waypoint x="600" y="486" /><di:waypoint x="395" y="486" /><di:waypoint x="395" y="502" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_DOA_SP2" bpmnElement="DOA_SP2">
+        <di:waypoint x="620" y="470" /><di:waypoint x="620" y="502" />
+      </bpmndi:BPMNEdge>
+
+      <!-- ── Praxis Pool  y=620  h=210 ── -->
+      <bpmndi:BPMNShape id="S_Pool_Praxis" bpmnElement="Pool_Praxis" isHorizontal="true">
+        <dc:Bounds x="160" y="620" width="900" height="210" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_StartPr" bpmnElement="Start_Praxis">
+        <dc:Bounds x="232" y="707" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_T_Pr1" bpmnElement="T_Pr_PruefenAktualisieren">
+        <dc:Bounds x="320" y="685" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_GW_WL" bpmnElement="GW_Pr_Warteliste" isMarkerVisible="true">
+        <dc:Bounds x="465" y="700" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_T_Pr2" bpmnElement="T_Pr_Nachruecker">
+        <dc:Bounds x="550" y="648" width="100" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_GW_PrM" bpmnElement="GW_Pr_Merge" isMarkerVisible="true">
+        <dc:Bounds x="695" y="700" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_EndPr" bpmnElement="End_Praxis">
+        <dc:Bounds x="792" y="707" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNEdge id="E_Pr1" bpmnElement="F_Pr1">
+        <di:waypoint x="268" y="725" /><di:waypoint x="320" y="725" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_Pr2" bpmnElement="F_Pr2">
+        <di:waypoint x="420" y="725" /><di:waypoint x="465" y="725" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_Pr3Ja" bpmnElement="F_Pr3_Ja">
+        <di:waypoint x="490" y="700" /><di:waypoint x="490" y="678" /><di:waypoint x="550" y="678" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_Pr3Nein" bpmnElement="F_Pr3_Nein">
+        <di:waypoint x="515" y="725" /><di:waypoint x="695" y="725" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_Pr4" bpmnElement="F_Pr4">
+        <di:waypoint x="650" y="678" /><di:waypoint x="720" y="678" /><di:waypoint x="720" y="700" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_Pr5" bpmnElement="F_Pr5">
+        <di:waypoint x="745" y="725" /><di:waypoint x="792" y="725" />
+      </bpmndi:BPMNEdge>
+
+      <!-- ── Message Flows ── -->
+      <bpmndi:BPMNEdge id="E_MF01" bpmnElement="MF01">
+        <di:waypoint x="530" y="190" />
+        <di:waypoint x="530" y="268" />
+        <di:waypoint x="250" y="268" />
+        <di:waypoint x="250" y="412" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_MF02" bpmnElement="MF02">
+        <di:waypoint x="780" y="390" />
+        <di:waypoint x="780" y="268" />
+        <di:waypoint x="670" y="268" />
+        <di:waypoint x="670" y="168" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_MF03" bpmnElement="MF03">
+        <di:waypoint x="930" y="470" />
+        <di:waypoint x="930" y="590" />
+        <di:waypoint x="250" y="590" />
+        <di:waypoint x="250" y="707" />
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

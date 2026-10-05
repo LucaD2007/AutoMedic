@@ -1,0 +1,568 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_09" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.50.1">
+  <bpmn:collaboration id="Collaboration_09">
+    <bpmn:participant id="Pool_Arzt" name="Arzt" processRef="Process_Arzt" />
+    <bpmn:participant id="Pool_System" name="Terminbuchungsplattform" processRef="Process_System" />
+    <bpmn:participant id="Pool_Patient" name="Patient" processRef="Process_Patient" />
+    <bpmn:messageFlow id="MF1" name="Behandlungsdokumentation" sourceRef="End_A" targetRef="Start_S" />
+    <bpmn:messageFlow id="MF2" name="Zusammenfassung inkl. Rezept (falls vorhanden)" sourceRef="Task_S3" targetRef="Start_P" />
+    <bpmn:messageFlow id="MF4" name="Feedback" sourceRef="Task_P3" targetRef="Task_S4" />
+    <bpmn:messageFlow id="Flow_1lkh6lk" name="Termininformationen" sourceRef="Activity_0qzg4o5" targetRef="Task_S4" />
+  </bpmn:collaboration>
+  <bpmn:process id="Process_Arzt" isExecutable="false">
+    <bpmn:startEvent id="Start_A" name="Behandlung abgeschlossen">
+      <bpmn:outgoing>sf_a1</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="Task_A1" name="Behandlung dokumentieren">
+      <bpmn:incoming>sf_a1</bpmn:incoming>
+      <bpmn:outgoing>sf_a2</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DOA_Diagnose">
+        <bpmn:targetRef>DO_Diagnose</bpmn:targetRef>
+      </bpmn:dataOutputAssociation>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="GW_A1" name="Rezept erforderlich?">
+      <bpmn:incoming>sf_a2</bpmn:incoming>
+      <bpmn:outgoing>sf_a3_ja</bpmn:outgoing>
+      <bpmn:outgoing>sf_a3_nein</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="Task_A2" name="Rezept erstellen und freigeben">
+      <bpmn:incoming>sf_a3_ja</bpmn:incoming>
+      <bpmn:outgoing>sf_a4</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DOA_Rezept">
+        <bpmn:targetRef>DO_Rezept</bpmn:targetRef>
+      </bpmn:dataOutputAssociation>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="GW_A1_merge">
+      <bpmn:incoming>sf_a4</bpmn:incoming>
+      <bpmn:incoming>sf_a3_nein</bpmn:incoming>
+      <bpmn:outgoing>sf_a5</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="GW_A2" name="Folgetermin nötig?">
+      <bpmn:incoming>sf_a5</bpmn:incoming>
+      <bpmn:outgoing>sf_a6_ja</bpmn:outgoing>
+      <bpmn:outgoing>sf_a6_nein</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="Task_A3" name="Folgetermin anordnen">
+      <bpmn:incoming>sf_a6_ja</bpmn:incoming>
+      <bpmn:outgoing>sf_a7</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="GW_A2_merge">
+      <bpmn:incoming>sf_a7</bpmn:incoming>
+      <bpmn:incoming>sf_a6_nein</bpmn:incoming>
+      <bpmn:outgoing>sf_a8</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="End_A" name="Dokumentation übermittelt">
+      <bpmn:incoming>sf_a8</bpmn:incoming>
+      <bpmn:messageEventDefinition id="MED_EndA" />
+    </bpmn:endEvent>
+    <bpmn:dataObjectReference id="DO_Diagnose" name="Diagnosebericht" dataObjectRef="DataObj_Diagnose" />
+    <bpmn:dataObject id="DataObj_Diagnose" />
+    <bpmn:sequenceFlow id="sf_a1" sourceRef="Start_A" targetRef="Task_A1" />
+    <bpmn:sequenceFlow id="sf_a2" sourceRef="Task_A1" targetRef="GW_A1" />
+    <bpmn:sequenceFlow id="sf_a3_ja" name="Ja" sourceRef="GW_A1" targetRef="Task_A2" />
+    <bpmn:sequenceFlow id="sf_a3_nein" name="Nein" sourceRef="GW_A1" targetRef="GW_A1_merge" />
+    <bpmn:sequenceFlow id="sf_a4" sourceRef="Task_A2" targetRef="GW_A1_merge" />
+    <bpmn:sequenceFlow id="sf_a5" sourceRef="GW_A1_merge" targetRef="GW_A2" />
+    <bpmn:sequenceFlow id="sf_a6_ja" name="Ja" sourceRef="GW_A2" targetRef="Task_A3" />
+    <bpmn:sequenceFlow id="sf_a6_nein" name="Nein" sourceRef="GW_A2" targetRef="GW_A2_merge" />
+    <bpmn:sequenceFlow id="sf_a7" sourceRef="Task_A3" targetRef="GW_A2_merge" />
+    <bpmn:sequenceFlow id="sf_a8" sourceRef="GW_A2_merge" targetRef="End_A" />
+    <bpmn:dataObjectReference id="DO_Rezept" name="Rezept" dataObjectRef="DataObj_Rezept" />
+    <bpmn:dataObject id="DataObj_Rezept" />
+  </bpmn:process>
+  <bpmn:process id="Process_System" isExecutable="false">
+    <bpmn:startEvent id="Start_S" name="Behandlungsdaten empfangen">
+      <bpmn:outgoing>sf_s1</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MED_StartS" />
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="Task_S1" name="Patientenakte aktualisieren">
+      <bpmn:incoming>sf_s1</bpmn:incoming>
+      <bpmn:outgoing>Flow_1wdxdd3</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DOA_S_Akte">
+        <bpmn:targetRef>DS_Patientenakte</bpmn:targetRef>
+      </bpmn:dataOutputAssociation>
+    </bpmn:serviceTask>
+    <bpmn:dataStoreReference id="DS_Patientenakte" name="Patientendatenbank" />
+    <bpmn:sequenceFlow id="sf_s1" sourceRef="Start_S" targetRef="Task_S1" />
+    <bpmn:sequenceFlow id="sf_s4" sourceRef="Task_S3" targetRef="Task_S4" />
+    <bpmn:sequenceFlow id="sf_s5" sourceRef="Task_S4" targetRef="End_S" />
+    <bpmn:sequenceFlow id="Flow_1wdxdd3" sourceRef="Task_S1" targetRef="Gateway_0dxsa7u" />
+    <bpmn:exclusiveGateway id="Gateway_0dxsa7u" name="Rezept vorhanden?">
+      <bpmn:incoming>Flow_1wdxdd3</bpmn:incoming>
+      <bpmn:outgoing>Flow_0hu6oyl</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0apkm45</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_0hu6oyl" name="Ja" sourceRef="Gateway_0dxsa7u" targetRef="Event_159kssw" />
+    <bpmn:intermediateCatchEvent id="Event_159kssw" name="Rezeptbestätigung erhalten">
+      <bpmn:incoming>Flow_0hu6oyl</bpmn:incoming>
+      <bpmn:outgoing>Flow_1jojjjq</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0uy3j4p" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:sequenceFlow id="Flow_1jojjjq" sourceRef="Event_159kssw" targetRef="Task_S2" />
+    <bpmn:sendTask id="Task_S2" name="Rezept verarbeiten und versenden">
+      <bpmn:incoming>Flow_1jojjjq</bpmn:incoming>
+      <bpmn:outgoing>Flow_1oej30x</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DOA_S_Rezept">
+        <bpmn:targetRef>DS_Rezepte</bpmn:targetRef>
+      </bpmn:dataOutputAssociation>
+    </bpmn:sendTask>
+    <bpmn:exclusiveGateway id="Gateway_1j6i7xj">
+      <bpmn:incoming>Flow_1oej30x</bpmn:incoming>
+      <bpmn:incoming>Flow_0apkm45</bpmn:incoming>
+      <bpmn:outgoing>Flow_1wz57yu</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="End_S" name="Post-Termin-Verarbeitung abgeschlossen">
+      <bpmn:incoming>sf_s5</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="Task_S4" name="Rückmeldungen verarbeiten">
+      <bpmn:incoming>sf_s4</bpmn:incoming>
+      <bpmn:outgoing>sf_s5</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DOA_S_Termine">
+        <bpmn:targetRef>DS_Termine</bpmn:targetRef>
+      </bpmn:dataOutputAssociation>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1oej30x" sourceRef="Task_S2" targetRef="Gateway_1j6i7xj" />
+    <bpmn:sequenceFlow id="Flow_0apkm45" name="Nein" sourceRef="Gateway_0dxsa7u" targetRef="Gateway_1j6i7xj" />
+    <bpmn:dataStoreReference id="DS_Rezepte" name="Rezeptdatenbank" />
+    <bpmn:sequenceFlow id="Flow_1wz57yu" sourceRef="Gateway_1j6i7xj" targetRef="Task_S3" />
+    <bpmn:sendTask id="Task_S3" name="Zusammenfassung versenden">
+      <bpmn:incoming>Flow_1wz57yu</bpmn:incoming>
+      <bpmn:outgoing>sf_s4</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:dataStoreReference id="DS_Termine" name="Terminkalender" />
+  </bpmn:process>
+  <bpmn:process id="Process_Patient" isExecutable="false">
+    <bpmn:startEvent id="Start_P" name="Zusammenfassung erhalten">
+      <bpmn:outgoing>sf_p1</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MED_StartP" />
+    </bpmn:startEvent>
+    <bpmn:userTask id="Task_P1" name="Zusammenfassung prüfen">
+      <bpmn:incoming>sf_p1</bpmn:incoming>
+      <bpmn:outgoing>Flow_1x0ezjm</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="sf_p1" sourceRef="Start_P" targetRef="Task_P1" />
+    <bpmn:sequenceFlow id="sf_p4_ja" name="Ja" sourceRef="GW_P1" targetRef="Task_P3" />
+    <bpmn:sequenceFlow id="sf_p4_nein" name="Nein" sourceRef="GW_P1" targetRef="GW_P1_merge" />
+    <bpmn:sequenceFlow id="sf_p5" sourceRef="Task_P3" targetRef="GW_P1_merge" />
+    <bpmn:sequenceFlow id="sf_p6" sourceRef="GW_P1_merge" targetRef="End_P" />
+    <bpmn:endEvent id="End_P" name="Post-Termin abgeschlossen">
+      <bpmn:incoming>sf_p6</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:exclusiveGateway id="GW_P1_merge">
+      <bpmn:incoming>sf_p5</bpmn:incoming>
+      <bpmn:incoming>sf_p4_nein</bpmn:incoming>
+      <bpmn:outgoing>sf_p6</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sendTask id="Task_P3" name="Feedback geben">
+      <bpmn:incoming>sf_p4_ja</bpmn:incoming>
+      <bpmn:outgoing>sf_p5</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:exclusiveGateway id="GW_P1" name="Feedback geben?">
+      <bpmn:incoming>Flow_02yi461</bpmn:incoming>
+      <bpmn:outgoing>sf_p4_ja</bpmn:outgoing>
+      <bpmn:outgoing>sf_p4_nein</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="Gateway_0aet0qb" name="Folgetermin angeordnet?">
+      <bpmn:incoming>Flow_1x0ezjm</bpmn:incoming>
+      <bpmn:outgoing>Flow_1esgxuo</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1j22nz9</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_1x0ezjm" sourceRef="Task_P1" targetRef="Gateway_0aet0qb" />
+    <bpmn:sequenceFlow id="Flow_1esgxuo" name="Ja" sourceRef="Gateway_0aet0qb" targetRef="Activity_0qzg4o5" />
+    <bpmn:exclusiveGateway id="Gateway_051uv83">
+      <bpmn:incoming>Flow_0b17ro7</bpmn:incoming>
+      <bpmn:incoming>Flow_1j22nz9</bpmn:incoming>
+      <bpmn:outgoing>Flow_02yi461</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_0b17ro7" sourceRef="Activity_0qzg4o5" targetRef="Gateway_051uv83" />
+    <bpmn:sequenceFlow id="Flow_1j22nz9" name="Nein" sourceRef="Gateway_0aet0qb" targetRef="Gateway_051uv83" />
+    <bpmn:sequenceFlow id="Flow_02yi461" sourceRef="Gateway_051uv83" targetRef="GW_P1" />
+    <bpmn:sendTask id="Activity_0qzg4o5" name="Folgetermin wählen">
+      <bpmn:incoming>Flow_1esgxuo</bpmn:incoming>
+      <bpmn:outgoing>Flow_0b17ro7</bpmn:outgoing>
+    </bpmn:sendTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_09">
+    <bpmndi:BPMNPlane id="BPMNPlane_09" bpmnElement="Collaboration_09">
+      <bpmndi:BPMNShape id="Shape_Pool_Arzt" bpmnElement="Pool_Arzt" isHorizontal="true">
+        <dc:Bounds x="160" y="40" width="1450" height="310" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Start_A" bpmnElement="Start_A">
+        <dc:Bounds x="222" y="172" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="200" y="215" width="80" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_A1" bpmnElement="Task_A1">
+        <dc:Bounds x="310" y="150" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GW_A1" bpmnElement="GW_A1" isMarkerVisible="true">
+        <dc:Bounds x="475" y="165" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="439" y="136" width="62" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_A2" bpmnElement="Task_A2">
+        <dc:Bounds x="570" y="80" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GW_A1_merge" bpmnElement="GW_A1_merge" isMarkerVisible="true">
+        <dc:Bounds x="735" y="165" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GW_A2" bpmnElement="GW_A2" isMarkerVisible="true">
+        <dc:Bounds x="830" y="165" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="784" y="156" width="59" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_A3" bpmnElement="Task_A3">
+        <dc:Bounds x="925" y="80" width="120" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GW_A2_merge" bpmnElement="GW_A2_merge" isMarkerVisible="true">
+        <dc:Bounds x="1090" y="165" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_End_A" bpmnElement="End_A">
+        <dc:Bounds x="1190" y="172" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1233" y="181" width="74" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_DO_Diagnose" bpmnElement="DO_Diagnose">
+        <dc:Bounds x="352" y="272" width="36" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="330" y="329" width="80" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_DO_Rezept" bpmnElement="DO_Rezept">
+        <dc:Bounds x="712" y="55" width="36" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="751" y="67" width="35" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Edge_sf_a1" bpmnElement="sf_a1">
+        <di:waypoint x="258" y="190" />
+        <di:waypoint x="310" y="190" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_a2" bpmnElement="sf_a2">
+        <di:waypoint x="430" y="190" />
+        <di:waypoint x="475" y="190" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_a3_ja" bpmnElement="sf_a3_ja">
+        <di:waypoint x="500" y="165" />
+        <di:waypoint x="500" y="120" />
+        <di:waypoint x="570" y="120" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="507" y="153" width="12" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_a3_nein" bpmnElement="sf_a3_nein">
+        <di:waypoint x="500" y="215" />
+        <di:waypoint x="500" y="260" />
+        <di:waypoint x="760" y="260" />
+        <di:waypoint x="760" y="215" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="508" y="211" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_a4" bpmnElement="sf_a4">
+        <di:waypoint x="690" y="120" />
+        <di:waypoint x="760" y="120" />
+        <di:waypoint x="760" y="165" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_a5" bpmnElement="sf_a5">
+        <di:waypoint x="785" y="190" />
+        <di:waypoint x="830" y="190" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_a6_ja" bpmnElement="sf_a6_ja">
+        <di:waypoint x="855" y="165" />
+        <di:waypoint x="855" y="120" />
+        <di:waypoint x="925" y="120" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="864" y="153" width="12" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_a6_nein" bpmnElement="sf_a6_nein">
+        <di:waypoint x="855" y="215" />
+        <di:waypoint x="855" y="260" />
+        <di:waypoint x="1115" y="260" />
+        <di:waypoint x="1115" y="215" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="852" y="211" width="35" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_a7" bpmnElement="sf_a7">
+        <di:waypoint x="1045" y="120" />
+        <di:waypoint x="1115" y="120" />
+        <di:waypoint x="1115" y="165" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_a8" bpmnElement="sf_a8">
+        <di:waypoint x="1140" y="190" />
+        <di:waypoint x="1190" y="190" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Shape_Pool_System" bpmnElement="Pool_System" isHorizontal="true">
+        <dc:Bounds x="160" y="410" width="1450" height="325" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Start_S" bpmnElement="Start_S">
+        <dc:Bounds x="222" y="522" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="195" y="565" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_S1" bpmnElement="Task_S1">
+        <dc:Bounds x="310" y="500" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_DS_Akte" bpmnElement="DS_Patientenakte">
+        <dc:Bounds x="345" y="610" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="318" y="667" width="100" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0dxsa7u_di" bpmnElement="Gateway_0dxsa7u" isMarkerVisible="true">
+        <dc:Bounds x="495" y="515" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="449.5" y="496" width="59" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_018inlo_di" bpmnElement="Event_159kssw">
+        <dc:Bounds x="572" y="452" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="530" y="414.5" width="103" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_S2" bpmnElement="Task_S2">
+        <dc:Bounds x="680" y="430" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1j6i7xj_di" bpmnElement="Gateway_1j6i7xj" isMarkerVisible="true">
+        <dc:Bounds x="905" y="515" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_End_S" bpmnElement="End_S">
+        <dc:Bounds x="1432" y="522" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1413" y="565" width="74" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_S4" bpmnElement="Task_S4">
+        <dc:Bounds x="1250" y="500" width="120" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_DS_Rezepte" bpmnElement="DS_Rezepte">
+        <dc:Bounds x="715" y="535" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="697" y="592" width="87" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_S3" bpmnElement="Task_S3">
+        <dc:Bounds x="1050" y="500" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_DS_Termine" bpmnElement="DS_Termine">
+        <dc:Bounds x="1375" y="645" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1362" y="621" width="76" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Edge_sf_s1" bpmnElement="sf_s1">
+        <di:waypoint x="258" y="540" />
+        <di:waypoint x="310" y="540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_s4" bpmnElement="sf_s4">
+        <di:waypoint x="1170" y="540" />
+        <di:waypoint x="1250" y="540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_s5" bpmnElement="sf_s5">
+        <di:waypoint x="1370" y="540" />
+        <di:waypoint x="1432" y="540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1wdxdd3_di" bpmnElement="Flow_1wdxdd3">
+        <di:waypoint x="430" y="540" />
+        <di:waypoint x="495" y="540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0hu6oyl_di" bpmnElement="Flow_0hu6oyl">
+        <di:waypoint x="520" y="515" />
+        <di:waypoint x="520" y="470" />
+        <di:waypoint x="572" y="470" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="529" y="489.5" width="12" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1jojjjq_di" bpmnElement="Flow_1jojjjq">
+        <di:waypoint x="608" y="470" />
+        <di:waypoint x="680" y="470" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1oej30x_di" bpmnElement="Flow_1oej30x">
+        <di:waypoint x="800" y="470" />
+        <di:waypoint x="930" y="470" />
+        <di:waypoint x="930" y="515" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0apkm45_di" bpmnElement="Flow_0apkm45">
+        <di:waypoint x="520" y="565" />
+        <di:waypoint x="520" y="630" />
+        <di:waypoint x="930" y="630" />
+        <di:waypoint x="930" y="565" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="528" y="566" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1wz57yu_di" bpmnElement="Flow_1wz57yu">
+        <di:waypoint x="955" y="540" />
+        <di:waypoint x="1050" y="540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Shape_Pool_Patient" bpmnElement="Pool_Patient" isHorizontal="true">
+        <dc:Bounds x="160" y="780" width="1450" height="310" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Start_P" bpmnElement="Start_P">
+        <dc:Bounds x="222" y="917" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="190" y="960" width="100" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1" bpmnElement="Task_P1">
+        <dc:Bounds x="310" y="895" width="120" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_End_P" bpmnElement="End_P">
+        <dc:Bounds x="1532" y="917" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1513" y="960" width="74" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GW_P1_merge" bpmnElement="GW_P1_merge" isMarkerVisible="true">
+        <dc:Bounds x="1425" y="910" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P3" bpmnElement="Task_P3">
+        <dc:Bounds x="1250" y="840" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GW_P1" bpmnElement="GW_P1" isMarkerVisible="true">
+        <dc:Bounds x="1055" y="910" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="974.5" y="903" width="89" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0aet0qb_di" bpmnElement="Gateway_0aet0qb" isMarkerVisible="true">
+        <dc:Bounds x="495" y="910" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="448" y="886" width="62" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_051uv83_di" bpmnElement="Gateway_051uv83" isMarkerVisible="true">
+        <dc:Bounds x="845" y="910" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1vk9mzi_di" bpmnElement="Activity_0qzg4o5">
+        <dc:Bounds x="640" y="840" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Edge_sf_p1" bpmnElement="sf_p1">
+        <di:waypoint x="258" y="935" />
+        <di:waypoint x="310" y="935" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_p4_ja" bpmnElement="sf_p4_ja">
+        <di:waypoint x="1080" y="910" />
+        <di:waypoint x="1080" y="880" />
+        <di:waypoint x="1250" y="880" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1094" y="893" width="12" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_p4_nein" bpmnElement="sf_p4_nein">
+        <di:waypoint x="1080" y="960" />
+        <di:waypoint x="1080" y="1000" />
+        <di:waypoint x="1450" y="1000" />
+        <di:waypoint x="1450" y="960" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1088" y="961" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_p5" bpmnElement="sf_p5">
+        <di:waypoint x="1370" y="880" />
+        <di:waypoint x="1450" y="880" />
+        <di:waypoint x="1450" y="910" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_sf_p6" bpmnElement="sf_p6">
+        <di:waypoint x="1475" y="935" />
+        <di:waypoint x="1532" y="935" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1x0ezjm_di" bpmnElement="Flow_1x0ezjm">
+        <di:waypoint x="430" y="935" />
+        <di:waypoint x="495" y="935" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1esgxuo_di" bpmnElement="Flow_1esgxuo">
+        <di:waypoint x="520" y="910" />
+        <di:waypoint x="520" y="880" />
+        <di:waypoint x="640" y="880" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="529" y="890" width="12" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0b17ro7_di" bpmnElement="Flow_0b17ro7">
+        <di:waypoint x="740" y="880" />
+        <di:waypoint x="870" y="880" />
+        <di:waypoint x="870" y="910" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1j22nz9_di" bpmnElement="Flow_1j22nz9">
+        <di:waypoint x="520" y="960" />
+        <di:waypoint x="520" y="990" />
+        <di:waypoint x="870" y="990" />
+        <di:waypoint x="870" y="960" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="528" y="956" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_02yi461_di" bpmnElement="Flow_02yi461">
+        <di:waypoint x="895" y="935" />
+        <di:waypoint x="1055" y="935" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_DOA_Diagnose" bpmnElement="DOA_Diagnose">
+        <di:waypoint x="370" y="230" />
+        <di:waypoint x="370" y="272" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_DOA_Rezept" bpmnElement="DOA_Rezept">
+        <di:waypoint x="690" y="89" />
+        <di:waypoint x="712" y="81" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_DOA_S_Akte" bpmnElement="DOA_S_Akte">
+        <di:waypoint x="370" y="580" />
+        <di:waypoint x="370" y="610" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_DOA_S_Rezept" bpmnElement="DOA_S_Rezept">
+        <di:waypoint x="740" y="510" />
+        <di:waypoint x="740" y="535" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_DOA_S_Termine" bpmnElement="DOA_S_Termine">
+        <di:waypoint x="1338" y="580" />
+        <di:waypoint x="1383" y="645" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_MF1" bpmnElement="MF1">
+        <di:waypoint x="1208" y="208" />
+        <di:waypoint x="1208" y="380" />
+        <di:waypoint x="240" y="380" />
+        <di:waypoint x="240" y="522" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="621" y="358" width="139" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_MF2" bpmnElement="MF2">
+        <di:waypoint x="1110" y="580" />
+        <di:waypoint x="1110" y="700" />
+        <di:waypoint x="240" y="700" />
+        <di:waypoint x="240" y="917" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="571" y="666" width="169" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_MF4" bpmnElement="MF4">
+        <di:waypoint x="1310" y="840" />
+        <di:waypoint x="1310" y="580" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1315" y="807" width="49" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1lkh6lk_di" bpmnElement="Flow_1lkh6lk">
+        <di:waypoint x="690" y="840" />
+        <di:waypoint x="690" y="750" />
+        <di:waypoint x="1280" y="750" />
+        <di:waypoint x="1280" y="580" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="697" y="753" width="125" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

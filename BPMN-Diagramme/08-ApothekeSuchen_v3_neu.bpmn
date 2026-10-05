@@ -1,0 +1,420 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                  id="Definitions_08"
+                  targetNamespace="http://bpmn.io/schema/bpmn"
+                  exporter="EKX DeepAgent"
+                  exporterVersion="3.0">
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!--  COLLABORATION                                         -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <bpmn:collaboration id="Collab_08">
+    <bpmn:participant id="Pool_Patient"  name="Patient"              processRef="Proc_Patient" />
+    <bpmn:participant id="Pool_System"   name="Gesundheitsplattform" processRef="Proc_System" />
+    <bpmn:participant id="Pool_Apotheke" name="Apotheke"             processRef="Proc_Apotheke" />
+
+    <bpmn:messageFlow id="MF1" name="Standort und Suchkriterien"
+        sourceRef="T_P1" targetRef="Start_S" />
+    <bpmn:messageFlow id="MF2" name="Ergebnisliste"
+        sourceRef="T_S2" targetRef="T_P2" />
+    <bpmn:messageFlow id="MF3" name="Apothekenwahl"
+        sourceRef="T_P2" targetRef="T_S3" />
+    <bpmn:messageFlow id="MF4" name="Detailinformationen"
+        sourceRef="T_S3" targetRef="T_P3" />
+    <bpmn:messageFlow id="MF5" name="Verfuegbarkeitsanfrage"
+        sourceRef="T_S2" targetRef="T_A1" />
+    <bpmn:messageFlow id="MF6" name="Bestandsrueckmeldung"
+        sourceRef="T_A1" targetRef="T_S2" />
+    <bpmn:messageFlow id="MF7" name="Reservierungsanfrage"
+        sourceRef="T_S4" targetRef="ICE_A1" />
+    <bpmn:messageFlow id="MF8" name="Reservierungsbestaetigung"
+        sourceRef="T_A2" targetRef="T_S4" />
+  </bpmn:collaboration>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!--  PATIENT  (5 Aktivitaeten)                             -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <bpmn:process id="Proc_Patient" isExecutable="false">
+
+    <bpmn:startEvent id="Start_P" name="Medikament / Apotheke benoetigt">
+      <bpmn:outgoing>fp1</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <bpmn:sendTask id="T_P1" name="Apothekensuche mit Kriterien starten">
+      <bpmn:incoming>fp1</bpmn:incoming><bpmn:outgoing>fp2</bpmn:outgoing>
+    </bpmn:sendTask>
+
+    <bpmn:userTask id="T_P2" name="Apotheke aus Ergebnisliste auswaehlen">
+      <bpmn:incoming>fp2</bpmn:incoming><bpmn:outgoing>fp3</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:userTask id="T_P3" name="Apothekendetails einsehen">
+      <bpmn:incoming>fp3</bpmn:incoming><bpmn:outgoing>fp4</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:exclusiveGateway id="GW_P1" name="Medikament reservieren?">
+      <bpmn:incoming>fp4</bpmn:incoming>
+      <bpmn:outgoing>fp5_Ja</bpmn:outgoing><bpmn:outgoing>fp5_Nein</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:userTask id="T_P4" name="Reservierung beauftragen">
+      <bpmn:incoming>fp5_Ja</bpmn:incoming><bpmn:outgoing>fp6</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:exclusiveGateway id="GW_P_Merge">
+      <bpmn:incoming>fp6</bpmn:incoming><bpmn:incoming>fp5_Nein</bpmn:incoming>
+      <bpmn:outgoing>fp7</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:manualTask id="T_P5" name="Apotheke aufsuchen">
+      <bpmn:incoming>fp7</bpmn:incoming><bpmn:outgoing>fp8</bpmn:outgoing>
+    </bpmn:manualTask>
+
+    <bpmn:endEvent id="End_P" name="Apotheke gefunden">
+      <bpmn:incoming>fp8</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <bpmn:sequenceFlow id="fp1"      sourceRef="Start_P"    targetRef="T_P1" />
+    <bpmn:sequenceFlow id="fp2"      sourceRef="T_P1"       targetRef="T_P2" />
+    <bpmn:sequenceFlow id="fp3"      sourceRef="T_P2"       targetRef="T_P3" />
+    <bpmn:sequenceFlow id="fp4"      sourceRef="T_P3"       targetRef="GW_P1" />
+    <bpmn:sequenceFlow id="fp5_Ja"   name="Ja"   sourceRef="GW_P1"  targetRef="T_P4" />
+    <bpmn:sequenceFlow id="fp5_Nein" name="Nein" sourceRef="GW_P1"  targetRef="GW_P_Merge" />
+    <bpmn:sequenceFlow id="fp6"      sourceRef="T_P4"       targetRef="GW_P_Merge" />
+    <bpmn:sequenceFlow id="fp7"      sourceRef="GW_P_Merge" targetRef="T_P5" />
+    <bpmn:sequenceFlow id="fp8"      sourceRef="T_P5"       targetRef="End_P" />
+  </bpmn:process>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!--  SYSTEM  (5 Aktivitaeten)                              -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <bpmn:process id="Proc_System" isExecutable="false">
+
+    <bpmn:startEvent id="Start_S" name="Suchanfrage empfangen">
+      <bpmn:outgoing>fs1</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MED_StartS" />
+    </bpmn:startEvent>
+
+    <bpmn:serviceTask id="T_S1" name="Apothekensuche durchfuehren">
+      <bpmn:incoming>fs1</bpmn:incoming><bpmn:outgoing>fs2</bpmn:outgoing>
+      <bpmn:property id="Prop_DS1" name="__targetRef_placeholder" />
+      <bpmn:dataInputAssociation id="DIA_S1">
+        <bpmn:sourceRef>DSR_Apotheken</bpmn:sourceRef>
+        <bpmn:targetRef>Prop_DS1</bpmn:targetRef>
+      </bpmn:dataInputAssociation>
+    </bpmn:serviceTask>
+
+    <bpmn:exclusiveGateway id="GW_S1" name="Apotheken gefunden?">
+      <bpmn:incoming>fs2</bpmn:incoming>
+      <bpmn:outgoing>fs3_Ja</bpmn:outgoing><bpmn:outgoing>fs3_Nein</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:sendTask id="T_S_Hinweis" name="Hinweis senden: keine Ergebnisse">
+      <bpmn:incoming>fs3_Nein</bpmn:incoming><bpmn:outgoing>fs3b</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:endEvent id="End_S_leer" name="Suche ohne Ergebnis beendet">
+      <bpmn:incoming>fs3b</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <bpmn:sendTask id="T_S2" name="Verfuegbarkeit pruefen und Ergebnisse senden">
+      <bpmn:incoming>fs3_Ja</bpmn:incoming><bpmn:outgoing>fs4</bpmn:outgoing>
+      <bpmn:property id="Prop_DS2" name="__targetRef_placeholder" />
+      <bpmn:dataInputAssociation id="DIA_S2">
+        <bpmn:sourceRef>DSR_Medikamente</bpmn:sourceRef>
+        <bpmn:targetRef>Prop_DS2</bpmn:targetRef>
+      </bpmn:dataInputAssociation>
+    </bpmn:sendTask>
+
+    <bpmn:serviceTask id="T_S3" name="Apothekendetails bereitstellen">
+      <bpmn:incoming>fs4</bpmn:incoming><bpmn:outgoing>fs5</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <bpmn:exclusiveGateway id="GW_S2" name="Reservierung angefragt?">
+      <bpmn:incoming>fs5</bpmn:incoming>
+      <bpmn:outgoing>fs6_Ja</bpmn:outgoing><bpmn:outgoing>fs6_Nein</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:serviceTask id="T_S4" name="Reservierung vermitteln">
+      <bpmn:incoming>fs6_Ja</bpmn:incoming><bpmn:outgoing>fs7</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <bpmn:exclusiveGateway id="GW_S_Merge">
+      <bpmn:incoming>fs7</bpmn:incoming><bpmn:incoming>fs6_Nein</bpmn:incoming>
+      <bpmn:outgoing>fs8</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:endEvent id="End_S" name="Prozess abgeschlossen">
+      <bpmn:incoming>fs8</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <bpmn:dataStoreReference id="DSR_Apotheken"    name="Apothekendatenbank" />
+    <bpmn:dataStoreReference id="DSR_Medikamente"  name="Medikamentenbestand" />
+
+    <bpmn:sequenceFlow id="fs1"      sourceRef="Start_S"    targetRef="T_S1" />
+    <bpmn:sequenceFlow id="fs2"      sourceRef="T_S1"       targetRef="GW_S1" />
+    <bpmn:sequenceFlow id="fs3_Ja"   name="Ja"   sourceRef="GW_S1"  targetRef="T_S2" />
+    <bpmn:sequenceFlow id="fs3_Nein" name="Nein" sourceRef="GW_S1"  targetRef="T_S_Hinweis" />
+    <bpmn:sequenceFlow id="fs3b"     sourceRef="T_S_Hinweis" targetRef="End_S_leer" />
+    <bpmn:sequenceFlow id="fs4"      sourceRef="T_S2"       targetRef="T_S3" />
+    <bpmn:sequenceFlow id="fs5"      sourceRef="T_S3"       targetRef="GW_S2" />
+    <bpmn:sequenceFlow id="fs6_Ja"   name="Ja"   sourceRef="GW_S2"  targetRef="T_S4" />
+    <bpmn:sequenceFlow id="fs6_Nein" name="Nein" sourceRef="GW_S2"  targetRef="GW_S_Merge" />
+    <bpmn:sequenceFlow id="fs7"      sourceRef="T_S4"       targetRef="GW_S_Merge" />
+    <bpmn:sequenceFlow id="fs8"      sourceRef="GW_S_Merge" targetRef="End_S" />
+  </bpmn:process>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!--  APOTHEKE  (2 Aktivitaeten + 1 Zwischenereignis)       -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <bpmn:process id="Proc_Apotheke" isExecutable="false">
+
+    <bpmn:startEvent id="Start_A" name="Verfuegbarkeitsanfrage erhalten">
+      <bpmn:outgoing>fa1</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MED_StartA" />
+    </bpmn:startEvent>
+
+    <bpmn:serviceTask id="T_A1" name="Medikamentenverfuegbarkeit rueckmelden">
+      <bpmn:incoming>fa1</bpmn:incoming><bpmn:outgoing>fa2</bpmn:outgoing>
+      <bpmn:property id="Prop_DSA" name="__targetRef_placeholder" />
+      <bpmn:dataInputAssociation id="DIA_A1">
+        <bpmn:sourceRef>DSR_Bestand</bpmn:sourceRef>
+        <bpmn:targetRef>Prop_DSA</bpmn:targetRef>
+      </bpmn:dataInputAssociation>
+    </bpmn:serviceTask>
+
+    <bpmn:intermediateCatchEvent id="ICE_A1" name="Reservierungsanfrage erhalten">
+      <bpmn:incoming>fa2</bpmn:incoming><bpmn:outgoing>fa3</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MED_ICE_A" />
+    </bpmn:intermediateCatchEvent>
+
+    <bpmn:exclusiveGateway id="GW_A1" name="Medikament noch verfuegbar?">
+      <bpmn:incoming>fa3</bpmn:incoming>
+      <bpmn:outgoing>fa4_Ja</bpmn:outgoing><bpmn:outgoing>fa4_Nein</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:serviceTask id="T_A2" name="Medikament reservieren und bestaetigen">
+      <bpmn:incoming>fa4_Ja</bpmn:incoming><bpmn:outgoing>fa5</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DOA_A1">
+        <bpmn:targetRef>DSR_Bestand</bpmn:targetRef>
+      </bpmn:dataOutputAssociation>
+    </bpmn:serviceTask>
+
+    <bpmn:endEvent id="End_A" name="Reservierung abgeschlossen">
+      <bpmn:incoming>fa5</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <bpmn:endEvent id="End_A_abbruch" name="Reservierung abgelehnt">
+      <bpmn:incoming>fa4_Nein</bpmn:incoming>
+      <bpmn:messageEventDefinition id="MED_A_Abbruch" />
+    </bpmn:endEvent>
+
+    <bpmn:dataStoreReference id="DSR_Bestand" name="Lagerbestand" />
+
+    <bpmn:sequenceFlow id="fa1"      sourceRef="Start_A"  targetRef="T_A1" />
+    <bpmn:sequenceFlow id="fa2"      sourceRef="T_A1"     targetRef="ICE_A1" />
+    <bpmn:sequenceFlow id="fa3"      sourceRef="ICE_A1"   targetRef="GW_A1" />
+    <bpmn:sequenceFlow id="fa4_Ja"   name="Ja"   sourceRef="GW_A1" targetRef="T_A2" />
+    <bpmn:sequenceFlow id="fa4_Nein" name="Nein" sourceRef="GW_A1" targetRef="End_A_abbruch" />
+    <bpmn:sequenceFlow id="fa5"      sourceRef="T_A2"     targetRef="End_A" />
+  </bpmn:process>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!--  DI                                                    -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <bpmndi:BPMNDiagram id="Diagram_08">
+    <bpmndi:BPMNPlane id="Plane_08" bpmnElement="Collab_08">
+
+      <!-- ── Patient Pool  y=20  h=220 ── -->
+      <bpmndi:BPMNShape id="S_Pool_P" bpmnElement="Pool_Patient" isHorizontal="true">
+        <dc:Bounds x="160" y="20" width="1440" height="220" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_StartP" bpmnElement="Start_P">
+        <dc:Bounds x="232" y="112" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_TP1" bpmnElement="T_P1">
+        <dc:Bounds x="320" y="90" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_TP2" bpmnElement="T_P2">
+        <dc:Bounds x="490" y="90" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_TP3" bpmnElement="T_P3">
+        <dc:Bounds x="660" y="90" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_GWP1" bpmnElement="GW_P1" isMarkerVisible="true">
+        <dc:Bounds x="825" y="105" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_TP4" bpmnElement="T_P4">
+        <dc:Bounds x="920" y="45" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_GWPm" bpmnElement="GW_P_Merge" isMarkerVisible="true">
+        <dc:Bounds x="1075" y="105" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_TP5" bpmnElement="T_P5">
+        <dc:Bounds x="1175" y="90" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_EndP" bpmnElement="End_P">
+        <dc:Bounds x="1342" y="112" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNEdge id="E_fp1" bpmnElement="fp1"><di:waypoint x="268" y="130" /><di:waypoint x="320" y="130" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_fp2" bpmnElement="fp2"><di:waypoint x="420" y="130" /><di:waypoint x="490" y="130" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_fp3" bpmnElement="fp3"><di:waypoint x="590" y="130" /><di:waypoint x="660" y="130" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_fp4" bpmnElement="fp4"><di:waypoint x="760" y="130" /><di:waypoint x="825" y="130" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_fp5Ja" bpmnElement="fp5_Ja">
+        <di:waypoint x="850" y="105" /><di:waypoint x="850" y="85" /><di:waypoint x="920" y="85" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_fp5Nein" bpmnElement="fp5_Nein">
+        <di:waypoint x="875" y="130" /><di:waypoint x="1075" y="130" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_fp6" bpmnElement="fp6">
+        <di:waypoint x="1020" y="85" /><di:waypoint x="1100" y="85" /><di:waypoint x="1100" y="105" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_fp7" bpmnElement="fp7"><di:waypoint x="1125" y="130" /><di:waypoint x="1175" y="130" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_fp8" bpmnElement="fp8"><di:waypoint x="1275" y="130" /><di:waypoint x="1342" y="130" /></bpmndi:BPMNEdge>
+
+      <!-- ── System Pool  y=300  h=280 ── -->
+      <bpmndi:BPMNShape id="S_Pool_S" bpmnElement="Pool_System" isHorizontal="true">
+        <dc:Bounds x="160" y="300" width="1440" height="280" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_StartS" bpmnElement="Start_S">
+        <dc:Bounds x="232" y="422" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_TS1" bpmnElement="T_S1">
+        <dc:Bounds x="320" y="400" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_GWS1" bpmnElement="GW_S1" isMarkerVisible="true">
+        <dc:Bounds x="465" y="415" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_TSH" bpmnElement="T_S_Hinweis">
+        <dc:Bounds x="440" y="510" width="100" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_EndSleer" bpmnElement="End_S_leer">
+        <dc:Bounds x="582" y="522" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_TS2" bpmnElement="T_S2">
+        <dc:Bounds x="560" y="400" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_TS3" bpmnElement="T_S3">
+        <dc:Bounds x="720" y="400" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_GWS2" bpmnElement="GW_S2" isMarkerVisible="true">
+        <dc:Bounds x="875" y="415" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_TS4" bpmnElement="T_S4">
+        <dc:Bounds x="970" y="400" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_GWSm" bpmnElement="GW_S_Merge" isMarkerVisible="true">
+        <dc:Bounds x="1125" y="415" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_EndS" bpmnElement="End_S">
+        <dc:Bounds x="1225" y="422" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_DSA" bpmnElement="DSR_Apotheken">
+        <dc:Bounds x="320" y="515" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_DSM" bpmnElement="DSR_Medikamente">
+        <dc:Bounds x="585" y="515" width="50" height="50" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNEdge id="E_fs1" bpmnElement="fs1"><di:waypoint x="268" y="440" /><di:waypoint x="320" y="440" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_fs2" bpmnElement="fs2"><di:waypoint x="420" y="440" /><di:waypoint x="465" y="440" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_fs3Ja" bpmnElement="fs3_Ja">
+        <di:waypoint x="515" y="440" /><di:waypoint x="560" y="440" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_fs3Nein" bpmnElement="fs3_Nein">
+        <di:waypoint x="490" y="465" /><di:waypoint x="490" y="510" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_fs3b" bpmnElement="fs3b">
+        <di:waypoint x="540" y="540" /><di:waypoint x="582" y="540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_fs4" bpmnElement="fs4"><di:waypoint x="660" y="440" /><di:waypoint x="720" y="440" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_fs5" bpmnElement="fs5"><di:waypoint x="820" y="440" /><di:waypoint x="875" y="440" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_fs6Ja" bpmnElement="fs6_Ja">
+        <di:waypoint x="925" y="440" /><di:waypoint x="970" y="440" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_fs6Nein" bpmnElement="fs6_Nein">
+        <di:waypoint x="900" y="465" /><di:waypoint x="900" y="500" /><di:waypoint x="1150" y="500" /><di:waypoint x="1150" y="465" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_fs7" bpmnElement="fs7"><di:waypoint x="1070" y="440" /><di:waypoint x="1125" y="440" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_fs8" bpmnElement="fs8"><di:waypoint x="1175" y="440" /><di:waypoint x="1225" y="440" /></bpmndi:BPMNEdge>
+      <!-- data assoc -->
+      <bpmndi:BPMNEdge id="E_DIA_S1" bpmnElement="DIA_S1"><di:waypoint x="345" y="515" /><di:waypoint x="370" y="480" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_DIA_S2" bpmnElement="DIA_S2"><di:waypoint x="610" y="515" /><di:waypoint x="610" y="480" /></bpmndi:BPMNEdge>
+
+      <!-- ── Apotheke Pool  y=640  h=230 ── -->
+      <bpmndi:BPMNShape id="S_Pool_A" bpmnElement="Pool_Apotheke" isHorizontal="true">
+        <dc:Bounds x="160" y="640" width="1440" height="230" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_StartA" bpmnElement="Start_A">
+        <dc:Bounds x="232" y="737" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_TA1" bpmnElement="T_A1">
+        <dc:Bounds x="320" y="715" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_ICEA" bpmnElement="ICE_A1">
+        <dc:Bounds x="482" y="737" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_GWA1" bpmnElement="GW_A1" isMarkerVisible="true">
+        <dc:Bounds x="575" y="730" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_TA2" bpmnElement="T_A2">
+        <dc:Bounds x="680" y="680" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_EndA" bpmnElement="End_A">
+        <dc:Bounds x="832" y="702" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_EndAx" bpmnElement="End_A_abbruch">
+        <dc:Bounds x="682" y="820" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_DSB" bpmnElement="DSR_Bestand">
+        <dc:Bounds x="345" y="810" width="50" height="50" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNEdge id="E_fa1" bpmnElement="fa1"><di:waypoint x="268" y="755" /><di:waypoint x="320" y="755" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_fa2" bpmnElement="fa2"><di:waypoint x="420" y="755" /><di:waypoint x="482" y="755" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_fa3" bpmnElement="fa3"><di:waypoint x="518" y="755" /><di:waypoint x="575" y="755" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_fa4Ja" bpmnElement="fa4_Ja">
+        <di:waypoint x="600" y="730" /><di:waypoint x="600" y="720" /><di:waypoint x="680" y="720" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_fa4Nein" bpmnElement="fa4_Nein">
+        <di:waypoint x="600" y="780" /><di:waypoint x="600" y="838" /><di:waypoint x="682" y="838" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_fa5" bpmnElement="fa5"><di:waypoint x="780" y="720" /><di:waypoint x="832" y="720" /></bpmndi:BPMNEdge>
+      <!-- data assoc -->
+      <bpmndi:BPMNEdge id="E_DIA_A1" bpmnElement="DIA_A1"><di:waypoint x="370" y="810" /><di:waypoint x="370" y="795" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_DOA_A1" bpmnElement="DOA_A1">
+        <di:waypoint x="730" y="760" /><di:waypoint x="730" y="835" /><di:waypoint x="395" y="835" />
+      </bpmndi:BPMNEdge>
+
+      <!-- ── Message Flows ── -->
+      <bpmndi:BPMNEdge id="E_MF1" bpmnElement="MF1">
+        <di:waypoint x="370" y="170" /><di:waypoint x="370" y="270" /><di:waypoint x="250" y="270" /><di:waypoint x="250" y="422" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_MF2" bpmnElement="MF2">
+        <di:waypoint x="610" y="400" /><di:waypoint x="610" y="280" /><di:waypoint x="540" y="280" /><di:waypoint x="540" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_MF3" bpmnElement="MF3">
+        <di:waypoint x="550" y="170" /><di:waypoint x="550" y="270" /><di:waypoint x="770" y="270" /><di:waypoint x="770" y="400" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_MF4" bpmnElement="MF4">
+        <di:waypoint x="780" y="400" /><di:waypoint x="780" y="280" /><di:waypoint x="720" y="280" /><di:waypoint x="720" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_MF5" bpmnElement="MF5">
+        <di:waypoint x="590" y="480" /><di:waypoint x="590" y="610" /><di:waypoint x="350" y="610" /><di:waypoint x="350" y="715" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_MF6" bpmnElement="MF6">
+        <di:waypoint x="390" y="715" /><di:waypoint x="390" y="620" /><di:waypoint x="630" y="620" /><di:waypoint x="630" y="480" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_MF7" bpmnElement="MF7">
+        <di:waypoint x="1020" y="480" /><di:waypoint x="1020" y="610" /><di:waypoint x="500" y="610" /><di:waypoint x="500" y="737" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_MF8" bpmnElement="MF8">
+        <di:waypoint x="730" y="680" /><di:waypoint x="730" y="620" /><di:waypoint x="1030" y="620" /><di:waypoint x="1030" y="480" />
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
