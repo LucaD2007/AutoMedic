@@ -1,1 +1,256 @@
-<?xml version="1.0" ...(argument truncated)
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                  id="Definitions_11"
+                  targetNamespace="http://bpmn.io/schema/bpmn"
+                  exporter="EKX DeepAgent"
+                  exporterVersion="2.0">
+
+  <bpmn:collaboration id="Collaboration_11">
+    <bpmn:participant id="Pool_Patient" name="Patient" processRef="Process_Patient" />
+    <bpmn:participant id="Pool_System" name="Terminbuchungsplattform" processRef="Process_System" />
+    <bpmn:participant id="Pool_Arzt" name="Arzt" processRef="Process_Arzt" />
+    <bpmn:participant id="Pool_Apotheke" name="Apotheke" processRef="Process_Apotheke" />
+
+    <bpmn:messageFlow id="MF_01" name="Folgerezeptanfrage" sourceRef="Task_P_Anfordern" targetRef="Start_System" />
+    <bpmn:messageFlow id="MF_02" name="Anfrage zur Pruefung" sourceRef="Task_S_AnArztWeiterleiten" targetRef="Start_Arzt" />
+    <bpmn:messageFlow id="MF_03" name="Arztentscheidung" sourceRef="Task_Arzt_Entscheiden" targetRef="Task_S_EntscheidungVerarbeiten" />
+    <bpmn:messageFlow id="MF_04" name="Digitales Rezept" sourceRef="Task_S_RezeptSenden" targetRef="Task_P_RezeptErhalten" />
+    <bpmn:messageFlow id="MF_05" name="Rezept zur Einloesung" sourceRef="Task_S_RezeptSenden" targetRef="Start_Apotheke" />
+  </bpmn:collaboration>
+
+  <bpmn:process id="Process_Patient" isExecutable="false">
+    <bpmn:startEvent id="Start_Patient" name="Folgerezept benoetigt">
+      <bpmn:outgoing>Flow_P1</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="Task_P_Anfordern" name="Folgerezept fuer Medikament anfordern">
+      <bpmn:incoming>Flow_P1</bpmn:incoming>
+      <bpmn:outgoing>Flow_P2</bpmn:outgoing>
+      <bpmn:property id="Prop_P_Notiz" name="__targetRef_placeholder" />
+      <bpmn:dataInputAssociation id="DIA_P1">
+        <bpmn:sourceRef>DataObject_Notiz</bpmn:sourceRef>
+        <bpmn:targetRef>Prop_P_Notiz</bpmn:targetRef>
+      </bpmn:dataInputAssociation>
+    </bpmn:userTask>
+    <bpmn:userTask id="Task_P_RezeptErhalten" name="Digitales Rezept empfangen und speichern">
+      <bpmn:incoming>Flow_P2</bpmn:incoming>
+      <bpmn:outgoing>Flow_P3</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="End_Patient" name="Folgerezept erhalten">
+      <bpmn:incoming>Flow_P3</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:dataObjectReference id="DataObject_Notiz" name="Patientennotiz" dataObjectRef="DO_Notiz" />
+    <bpmn:dataObject id="DO_Notiz" />
+    <bpmn:sequenceFlow id="Flow_P1" sourceRef="Start_Patient" targetRef="Task_P_Anfordern" />
+    <bpmn:sequenceFlow id="Flow_P2" sourceRef="Task_P_Anfordern" targetRef="Task_P_RezeptErhalten" />
+    <bpmn:sequenceFlow id="Flow_P3" sourceRef="Task_P_RezeptErhalten" targetRef="End_Patient" />
+  </bpmn:process>
+
+  <bpmn:process id="Process_System" isExecutable="false">
+    <bpmn:startEvent id="Start_System" name="Folgerezeptanfrage empfangen">
+      <bpmn:outgoing>Flow_S1</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MED_Start_S" />
+    </bpmn:startEvent>
+    <bpmn:subProcess id="Task_S_AnfragePruefen" name="Anfrage pruefen (Intervall und Historie)">
+      <bpmn:incoming>Flow_S1</bpmn:incoming>
+      <bpmn:outgoing>Flow_S2</bpmn:outgoing>
+      <bpmn:property id="Prop_S_Rez" name="__targetRef_placeholder" />
+      <bpmn:dataInputAssociation id="DIA_S1">
+        <bpmn:sourceRef>DataStore_Rezepte</bpmn:sourceRef>
+        <bpmn:targetRef>Prop_S_Rez</bpmn:targetRef>
+      </bpmn:dataInputAssociation>
+    </bpmn:subProcess>
+    <bpmn:sendTask id="Task_S_AnArztWeiterleiten" name="Anfrage an Arzt weiterleiten">
+      <bpmn:incoming>Flow_S2</bpmn:incoming>
+      <bpmn:outgoing>Flow_S3</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:receiveTask id="Task_S_EntscheidungVerarbeiten" name="Arztentscheidung verarbeiten und Rezept erstellen">
+      <bpmn:incoming>Flow_S3</bpmn:incoming>
+      <bpmn:outgoing>Flow_S4</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DOA_S1">
+        <bpmn:targetRef>DataStore_Rezepte</bpmn:targetRef>
+      </bpmn:dataOutputAssociation>
+    </bpmn:receiveTask>
+    <bpmn:sendTask id="Task_S_RezeptSenden" name="Rezept an Patient und Apotheke senden">
+      <bpmn:incoming>Flow_S4</bpmn:incoming>
+      <bpmn:outgoing>Flow_S5</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:endEvent id="End_System" name="Folgerezept ausgestellt">
+      <bpmn:incoming>Flow_S5</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:dataStoreReference id="DataStore_Rezepte" name="Rezeptdatenbank" />
+    <bpmn:sequenceFlow id="Flow_S1" sourceRef="Start_System" targetRef="Task_S_AnfragePruefen" />
+    <bpmn:sequenceFlow id="Flow_S2" sourceRef="Task_S_AnfragePruefen" targetRef="Task_S_AnArztWeiterleiten" />
+    <bpmn:sequenceFlow id="Flow_S3" sourceRef="Task_S_AnArztWeiterleiten" targetRef="Task_S_EntscheidungVerarbeiten" />
+    <bpmn:sequenceFlow id="Flow_S4" sourceRef="Task_S_EntscheidungVerarbeiten" targetRef="Task_S_RezeptSenden" />
+    <bpmn:sequenceFlow id="Flow_S5" sourceRef="Task_S_RezeptSenden" targetRef="End_System" />
+  </bpmn:process>
+
+  <bpmn:process id="Process_Arzt" isExecutable="false">
+    <bpmn:startEvent id="Start_Arzt" name="Pruefauftrag erhalten">
+      <bpmn:outgoing>Flow_Ar1</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MED_Start_Ar" />
+    </bpmn:startEvent>
+    <bpmn:userTask id="Task_Arzt_Pruefen" name="Patientenakte und Medikamentenhistorie pruefen">
+      <bpmn:incoming>Flow_Ar1</bpmn:incoming>
+      <bpmn:outgoing>Flow_Ar2</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="Task_Arzt_Entscheiden" name="Rezept genehmigen und digital signieren">
+      <bpmn:incoming>Flow_Ar2</bpmn:incoming>
+      <bpmn:outgoing>Flow_Ar3</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DOA_Ar1">
+        <bpmn:targetRef>DataObject_SigniertesRezept</bpmn:targetRef>
+      </bpmn:dataOutputAssociation>
+    </bpmn:userTask>
+    <bpmn:endEvent id="End_Arzt" name="Entscheidung getroffen">
+      <bpmn:incoming>Flow_Ar3</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:dataObjectReference id="DataObject_SigniertesRezept" name="Signiertes Rezept" dataObjectRef="DO_SigRezept" />
+    <bpmn:dataObject id="DO_SigRezept" />
+    <bpmn:sequenceFlow id="Flow_Ar1" sourceRef="Start_Arzt" targetRef="Task_Arzt_Pruefen" />
+    <bpmn:sequenceFlow id="Flow_Ar2" sourceRef="Task_Arzt_Pruefen" targetRef="Task_Arzt_Entscheiden" />
+    <bpmn:sequenceFlow id="Flow_Ar3" sourceRef="Task_Arzt_Entscheiden" targetRef="End_Arzt" />
+  </bpmn:process>
+
+  <bpmn:process id="Process_Apotheke" isExecutable="false">
+    <bpmn:startEvent id="Start_Apotheke" name="Rezept zur Einloesung erhalten">
+      <bpmn:outgoing>Flow_Ap1</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MED_Start_Ap" />
+    </bpmn:startEvent>
+    <bpmn:userTask id="Task_Ap_Pruefen" name="Rezept pruefen und Medikament bereitstellen">
+      <bpmn:incoming>Flow_Ap1</bpmn:incoming>
+      <bpmn:outgoing>Flow_Ap2</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="Task_Ap_Reservieren" name="Medikament reservieren und Abholung melden">
+      <bpmn:incoming>Flow_Ap2</bpmn:incoming>
+      <bpmn:outgoing>Flow_Ap3</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="End_Apotheke" name="Medikament bereit">
+      <bpmn:incoming>Flow_Ap3</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_Ap1" sourceRef="Start_Apotheke" targetRef="Task_Ap_Pruefen" />
+    <bpmn:sequenceFlow id="Flow_Ap2" sourceRef="Task_Ap_Pruefen" targetRef="Task_Ap_Reservieren" />
+    <bpmn:sequenceFlow id="Flow_Ap3" sourceRef="Task_Ap_Reservieren" targetRef="End_Apotheke" />
+  </bpmn:process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_11">
+
+      <bpmndi:BPMNShape id="Shape_Pool_Patient" bpmnElement="Pool_Patient" isHorizontal="true">
+        <dc:Bounds x="160" y="60" width="1000" height="200" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Start_Patient" bpmnElement="Start_Patient">
+        <dc:Bounds x="222" y="142" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P_Anfordern" bpmnElement="Task_P_Anfordern">
+        <dc:Bounds x="300" y="120" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P_RezeptErhalten" bpmnElement="Task_P_RezeptErhalten">
+        <dc:Bounds x="820" y="120" width="150" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_End_Patient" bpmnElement="End_Patient">
+        <dc:Bounds x="1012" y="142" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_DO_Notiz" bpmnElement="DataObject_Notiz">
+        <dc:Bounds x="352" y="60" width="36" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Edge_P1" bpmnElement="Flow_P1"><di:waypoint x="258" y="160" /><di:waypoint x="300" y="160" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P2" bpmnElement="Flow_P2"><di:waypoint x="440" y="160" /><di:waypoint x="820" y="160" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P3" bpmnElement="Flow_P3"><di:waypoint x="970" y="160" /><di:waypoint x="1012" y="160" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_DIA_P1" bpmnElement="DIA_P1"><di:waypoint x="370" y="110" /><di:waypoint x="370" y="120" /></bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNShape id="Shape_Pool_System" bpmnElement="Pool_System" isHorizontal="true">
+        <dc:Bounds x="160" y="300" width="1000" height="240" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Start_System" bpmnElement="Start_System">
+        <dc:Bounds x="222" y="392" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_S_Pruefen" bpmnElement="Task_S_AnfragePruefen">
+        <dc:Bounds x="300" y="370" width="150" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_S_Weiterleiten" bpmnElement="Task_S_AnArztWeiterleiten">
+        <dc:Bounds x="500" y="370" width="130" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_S_Entscheidung" bpmnElement="Task_S_EntscheidungVerarbeiten">
+        <dc:Bounds x="680" y="370" width="150" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_S_RezeptSenden" bpmnElement="Task_S_RezeptSenden">
+        <dc:Bounds x="880" y="370" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_End_System" bpmnElement="End_System">
+        <dc:Bounds x="1072" y="392" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_DS_Rezepte" bpmnElement="DataStore_Rezepte">
+        <dc:Bounds x="350" y="470" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Edge_S1" bpmnElement="Flow_S1"><di:waypoint x="258" y="410" /><di:waypoint x="300" y="410" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_S2" bpmnElement="Flow_S2"><di:waypoint x="450" y="410" /><di:waypoint x="500" y="410" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_S3" bpmnElement="Flow_S3"><di:waypoint x="630" y="410" /><di:waypoint x="680" y="410" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_S4" bpmnElement="Flow_S4"><di:waypoint x="830" y="410" /><di:waypoint x="880" y="410" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_S5" bpmnElement="Flow_S5"><di:waypoint x="1020" y="410" /><di:waypoint x="1072" y="410" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_DIA_S1" bpmnElement="DIA_S1"><di:waypoint x="375" y="470" /><di:waypoint x="375" y="450" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_DOA_S1" bpmnElement="DOA_S1"><di:waypoint x="755" y="450" /><di:waypoint x="400" y="490" /></bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNShape id="Shape_Pool_Arzt" bpmnElement="Pool_Arzt" isHorizontal="true">
+        <dc:Bounds x="160" y="580" width="1000" height="200" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Start_Arzt" bpmnElement="Start_Arzt">
+        <dc:Bounds x="502" y="662" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Arzt_Pruefen" bpmnElement="Task_Arzt_Pruefen">
+        <dc:Bounds x="580" y="640" width="150" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Arzt_Entscheiden" bpmnElement="Task_Arzt_Entscheiden">
+        <dc:Bounds x="770" y="640" width="150" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_End_Arzt" bpmnElement="End_Arzt">
+        <dc:Bounds x="962" y="662" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_DO_SigRezept" bpmnElement="DataObject_SigniertesRezept">
+        <dc:Bounds x="827" y="580" width="36" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Edge_Ar1" bpmnElement="Flow_Ar1"><di:waypoint x="538" y="680" /><di:waypoint x="580" y="680" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Ar2" bpmnElement="Flow_Ar2"><di:waypoint x="730" y="680" /><di:waypoint x="770" y="680" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Ar3" bpmnElement="Flow_Ar3"><di:waypoint x="920" y="680" /><di:waypoint x="962" y="680" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_DOA_Ar1" bpmnElement="DOA_Ar1"><di:waypoint x="845" y="640" /><di:waypoint x="845" y="630" /></bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNShape id="Shape_Pool_Apotheke" bpmnElement="Pool_Apotheke" isHorizontal="true">
+        <dc:Bounds x="160" y="820" width="1000" height="180" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Start_Apotheke" bpmnElement="Start_Apotheke">
+        <dc:Bounds x="902" y="892" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Ap_Pruefen" bpmnElement="Task_Ap_Pruefen">
+        <dc:Bounds x="620" y="870" width="150" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Ap_Reservieren" bpmnElement="Task_Ap_Reservieren">
+        <dc:Bounds x="410" y="870" width="160" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_End_Apotheke" bpmnElement="End_Apotheke">
+        <dc:Bounds x="332" y="892" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Edge_Ap1" bpmnElement="Flow_Ap1"><di:waypoint x="902" y="910" /><di:waypoint x="770" y="910" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Ap2" bpmnElement="Flow_Ap2"><di:waypoint x="620" y="910" /><di:waypoint x="570" y="910" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Ap3" bpmnElement="Flow_Ap3"><di:waypoint x="410" y="910" /><di:waypoint x="368" y="910" /></bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Edge_MF01" bpmnElement="MF_01">
+        <di:waypoint x="370" y="200" /><di:waypoint x="370" y="280" /><di:waypoint x="240" y="280" /><di:waypoint x="240" y="392" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_MF02" bpmnElement="MF_02">
+        <di:waypoint x="565" y="450" /><di:waypoint x="565" y="540" /><di:waypoint x="520" y="540" /><di:waypoint x="520" y="662" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_MF03" bpmnElement="MF_03">
+        <di:waypoint x="845" y="640" /><di:waypoint x="845" y="560" /><di:waypoint x="755" y="560" /><di:waypoint x="755" y="450" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_MF04" bpmnElement="MF_04">
+        <di:waypoint x="950" y="370" /><di:waypoint x="950" y="280" /><di:waypoint x="895" y="280" /><di:waypoint x="895" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_MF05" bpmnElement="MF_05">
+        <di:waypoint x="950" y="450" /><di:waypoint x="950" y="780" /><di:waypoint x="920" y="780" /><di:waypoint x="920" y="892" />
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
