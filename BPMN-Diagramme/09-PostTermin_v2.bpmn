@@ -7,7 +7,8 @@
     <bpmn:messageFlow id="MF1" name="Behandlungsdokumentation" sourceRef="End_A" targetRef="Start_S" />
     <bpmn:messageFlow id="MF2" name="Zusammenfassung inkl. Rezept (falls vorhanden)" sourceRef="Task_S3" targetRef="Start_P" />
     <bpmn:messageFlow id="MF4" name="Feedback" sourceRef="Task_P3" targetRef="Task_S4" />
-    <bpmn:messageFlow id="Flow_1lkh6lk" name="Termininformationen" sourceRef="Activity_0qzg4o5" targetRef="Task_S4" />
+    <bpmn:messageFlow id="Flow_1lkh6lk" name="Folgetermin-Auswahl" sourceRef="Activity_0qzg4o5" targetRef="Task_S4" />
+    <bpmn:messageFlow id="Flow_0iwf0t4" name="Rezept" sourceRef="Task_A2" targetRef="Task_S2" />
   </bpmn:collaboration>
   <bpmn:process id="Process_Arzt" isExecutable="false">
     <bpmn:startEvent id="Start_A" name="Behandlung abgeschlossen">
@@ -51,7 +52,7 @@
       <bpmn:incoming>sf_a6_nein</bpmn:incoming>
       <bpmn:outgoing>sf_a8</bpmn:outgoing>
     </bpmn:exclusiveGateway>
-    <bpmn:endEvent id="End_A" name="Dokumentation übermittelt">
+    <bpmn:endEvent id="End_A" name="Behandlungsdokumentation übermittelt">
       <bpmn:incoming>sf_a8</bpmn:incoming>
       <bpmn:messageEventDefinition id="MED_EndA" />
     </bpmn:endEvent>
@@ -71,7 +72,7 @@
     <bpmn:dataObject id="DataObj_Rezept" />
   </bpmn:process>
   <bpmn:process id="Process_System" isExecutable="false">
-    <bpmn:startEvent id="Start_S" name="Behandlungsdaten empfangen">
+    <bpmn:startEvent id="Start_S" name="Behandlungs-dokumentation empfangen">
       <bpmn:outgoing>sf_s1</bpmn:outgoing>
       <bpmn:messageEventDefinition id="MED_StartS" />
     </bpmn:startEvent>
@@ -84,52 +85,46 @@
     </bpmn:serviceTask>
     <bpmn:dataStoreReference id="DS_Patientenakte" name="Patientendatenbank" />
     <bpmn:sequenceFlow id="sf_s1" sourceRef="Start_S" targetRef="Task_S1" />
-    <bpmn:sequenceFlow id="sf_s4" sourceRef="Task_S3" targetRef="Task_S4" />
     <bpmn:sequenceFlow id="sf_s5" sourceRef="Task_S4" targetRef="End_S" />
     <bpmn:sequenceFlow id="Flow_1wdxdd3" sourceRef="Task_S1" targetRef="Gateway_0dxsa7u" />
-    <bpmn:exclusiveGateway id="Gateway_0dxsa7u" name="Rezept vorhanden?">
+    <bpmn:exclusiveGateway id="Gateway_0dxsa7u" name="Rezept erforderlich?">
       <bpmn:incoming>Flow_1wdxdd3</bpmn:incoming>
-      <bpmn:outgoing>Flow_0hu6oyl</bpmn:outgoing>
       <bpmn:outgoing>Flow_0apkm45</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0hu6oyl</bpmn:outgoing>
     </bpmn:exclusiveGateway>
-    <bpmn:sequenceFlow id="Flow_0hu6oyl" name="Ja" sourceRef="Gateway_0dxsa7u" targetRef="Event_159kssw" />
-    <bpmn:intermediateCatchEvent id="Event_159kssw" name="Rezeptbestätigung erhalten">
-      <bpmn:incoming>Flow_0hu6oyl</bpmn:incoming>
-      <bpmn:outgoing>Flow_1jojjjq</bpmn:outgoing>
-      <bpmn:messageEventDefinition id="MessageEventDefinition_0uy3j4p" />
-    </bpmn:intermediateCatchEvent>
-    <bpmn:sequenceFlow id="Flow_1jojjjq" sourceRef="Event_159kssw" targetRef="Task_S2" />
-    <bpmn:sendTask id="Task_S2" name="Rezept verarbeiten und versenden">
-      <bpmn:incoming>Flow_1jojjjq</bpmn:incoming>
-      <bpmn:outgoing>Flow_1oej30x</bpmn:outgoing>
-      <bpmn:dataOutputAssociation id="DOA_S_Rezept">
-        <bpmn:targetRef>DS_Rezepte</bpmn:targetRef>
-      </bpmn:dataOutputAssociation>
-    </bpmn:sendTask>
     <bpmn:exclusiveGateway id="Gateway_1j6i7xj">
       <bpmn:incoming>Flow_1oej30x</bpmn:incoming>
       <bpmn:incoming>Flow_0apkm45</bpmn:incoming>
       <bpmn:outgoing>Flow_1wz57yu</bpmn:outgoing>
     </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_1oej30x" sourceRef="Task_S2" targetRef="Gateway_1j6i7xj" />
+    <bpmn:sequenceFlow id="Flow_0apkm45" name="Nein" sourceRef="Gateway_0dxsa7u" targetRef="Gateway_1j6i7xj" />
+    <bpmn:sequenceFlow id="Flow_1wz57yu" sourceRef="Gateway_1j6i7xj" targetRef="Task_S3" />
+    <bpmn:sendTask id="Task_S3" name="Zusammenfassung versenden">
+      <bpmn:incoming>Flow_1wz57yu</bpmn:incoming>
+      <bpmn:outgoing>Flow_0ia3cv0</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:dataStoreReference id="DS_Termine" name="Terminkalender" />
     <bpmn:endEvent id="End_S" name="Post-Termin-Verarbeitung abgeschlossen">
       <bpmn:incoming>sf_s5</bpmn:incoming>
     </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0ia3cv0" sourceRef="Task_S3" targetRef="Task_S4" />
     <bpmn:serviceTask id="Task_S4" name="Rückmeldungen verarbeiten">
-      <bpmn:incoming>sf_s4</bpmn:incoming>
+      <bpmn:incoming>Flow_0ia3cv0</bpmn:incoming>
       <bpmn:outgoing>sf_s5</bpmn:outgoing>
       <bpmn:dataOutputAssociation id="DOA_S_Termine">
         <bpmn:targetRef>DS_Termine</bpmn:targetRef>
       </bpmn:dataOutputAssociation>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_1oej30x" sourceRef="Task_S2" targetRef="Gateway_1j6i7xj" />
-    <bpmn:sequenceFlow id="Flow_0apkm45" name="Nein" sourceRef="Gateway_0dxsa7u" targetRef="Gateway_1j6i7xj" />
-    <bpmn:dataStoreReference id="DS_Rezepte" name="Rezeptdatenbank" />
-    <bpmn:sequenceFlow id="Flow_1wz57yu" sourceRef="Gateway_1j6i7xj" targetRef="Task_S3" />
-    <bpmn:sendTask id="Task_S3" name="Zusammenfassung versenden">
-      <bpmn:incoming>Flow_1wz57yu</bpmn:incoming>
-      <bpmn:outgoing>sf_s4</bpmn:outgoing>
+    <bpmn:sequenceFlow id="Flow_0hu6oyl" name="Ja" sourceRef="Gateway_0dxsa7u" targetRef="Task_S2" />
+    <bpmn:sendTask id="Task_S2" name="Rezept verarbeiten und versenden">
+      <bpmn:incoming>Flow_0hu6oyl</bpmn:incoming>
+      <bpmn:outgoing>Flow_1oej30x</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DOA_S_Rezept">
+        <bpmn:targetRef>DS_Rezepte</bpmn:targetRef>
+      </bpmn:dataOutputAssociation>
     </bpmn:sendTask>
-    <bpmn:dataStoreReference id="DS_Termine" name="Terminkalender" />
+    <bpmn:dataStoreReference id="DS_Rezepte" name="Rezeptdatenbank" />
   </bpmn:process>
   <bpmn:process id="Process_Patient" isExecutable="false">
     <bpmn:startEvent id="Start_P" name="Zusammenfassung erhalten">
@@ -153,10 +148,6 @@
       <bpmn:incoming>sf_p4_nein</bpmn:incoming>
       <bpmn:outgoing>sf_p6</bpmn:outgoing>
     </bpmn:exclusiveGateway>
-    <bpmn:sendTask id="Task_P3" name="Feedback geben">
-      <bpmn:incoming>sf_p4_ja</bpmn:incoming>
-      <bpmn:outgoing>sf_p5</bpmn:outgoing>
-    </bpmn:sendTask>
     <bpmn:exclusiveGateway id="GW_P1" name="Feedback geben?">
       <bpmn:incoming>Flow_02yi461</bpmn:incoming>
       <bpmn:outgoing>sf_p4_ja</bpmn:outgoing>
@@ -180,6 +171,10 @@
     <bpmn:sendTask id="Activity_0qzg4o5" name="Folgetermin wählen">
       <bpmn:incoming>Flow_1esgxuo</bpmn:incoming>
       <bpmn:outgoing>Flow_0b17ro7</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:sendTask id="Task_P3" name="Feedback geben">
+      <bpmn:incoming>sf_p4_ja</bpmn:incoming>
+      <bpmn:outgoing>sf_p5</bpmn:outgoing>
     </bpmn:sendTask>
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_09">
@@ -224,7 +219,7 @@
       <bpmndi:BPMNShape id="Shape_End_A" bpmnElement="End_A">
         <dc:Bounds x="1190" y="172" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1233" y="181" width="74" height="27" />
+          <dc:Bounds x="1229" y="181" width="151" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Shape_DO_Diagnose" bpmnElement="DO_Diagnose">
@@ -305,7 +300,7 @@
       <bpmndi:BPMNShape id="Shape_Start_S" bpmnElement="Start_S">
         <dc:Bounds x="222" y="522" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="195" y="565" width="90" height="27" />
+          <dc:Bounds x="197" y="565" width="83" height="40" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Shape_S1" bpmnElement="Task_S1">
@@ -320,36 +315,11 @@
       <bpmndi:BPMNShape id="Gateway_0dxsa7u_di" bpmnElement="Gateway_0dxsa7u" isMarkerVisible="true">
         <dc:Bounds x="495" y="515" width="50" height="50" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="449.5" y="496" width="59" height="27" />
+          <dc:Bounds x="449" y="496" width="62" height="27" />
         </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_018inlo_di" bpmnElement="Event_159kssw">
-        <dc:Bounds x="572" y="452" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="530" y="414.5" width="103" height="27" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Shape_S2" bpmnElement="Task_S2">
-        <dc:Bounds x="680" y="430" width="120" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_1j6i7xj_di" bpmnElement="Gateway_1j6i7xj" isMarkerVisible="true">
         <dc:Bounds x="905" y="515" width="50" height="50" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Shape_End_S" bpmnElement="End_S">
-        <dc:Bounds x="1432" y="522" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1413" y="565" width="74" height="40" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Shape_S4" bpmnElement="Task_S4">
-        <dc:Bounds x="1250" y="500" width="120" height="80" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Shape_DS_Rezepte" bpmnElement="DS_Rezepte">
-        <dc:Bounds x="715" y="535" width="50" height="50" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="697" y="592" width="87" height="14" />
-        </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Shape_S3" bpmnElement="Task_S3">
         <dc:Bounds x="1050" y="500" width="120" height="80" />
@@ -360,17 +330,32 @@
           <dc:Bounds x="1362" y="621" width="76" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_End_S" bpmnElement="End_S">
+        <dc:Bounds x="1532" y="522" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1513" y="565" width="74" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_S4" bpmnElement="Task_S4">
+        <dc:Bounds x="1220" y="500" width="120" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_S2" bpmnElement="Task_S2">
+        <dc:Bounds x="570" y="430" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_DS_Rezepte" bpmnElement="DS_Rezepte">
+        <dc:Bounds x="715" y="515" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="697" y="572" width="87" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Edge_sf_s1" bpmnElement="sf_s1">
         <di:waypoint x="258" y="540" />
         <di:waypoint x="310" y="540" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Edge_sf_s4" bpmnElement="sf_s4">
-        <di:waypoint x="1170" y="540" />
-        <di:waypoint x="1250" y="540" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Edge_sf_s5" bpmnElement="sf_s5">
-        <di:waypoint x="1370" y="540" />
-        <di:waypoint x="1432" y="540" />
+        <di:waypoint x="1340" y="540" />
+        <di:waypoint x="1532" y="540" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1wdxdd3_di" bpmnElement="Flow_1wdxdd3">
         <di:waypoint x="430" y="540" />
@@ -379,17 +364,13 @@
       <bpmndi:BPMNEdge id="Flow_0hu6oyl_di" bpmnElement="Flow_0hu6oyl">
         <di:waypoint x="520" y="515" />
         <di:waypoint x="520" y="470" />
-        <di:waypoint x="572" y="470" />
+        <di:waypoint x="570" y="470" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="529" y="489.5" width="12" height="14" />
+          <dc:Bounds x="529" y="490" width="12" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1jojjjq_di" bpmnElement="Flow_1jojjjq">
-        <di:waypoint x="608" y="470" />
-        <di:waypoint x="680" y="470" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1oej30x_di" bpmnElement="Flow_1oej30x">
-        <di:waypoint x="800" y="470" />
+        <di:waypoint x="690" y="470" />
         <di:waypoint x="930" y="470" />
         <di:waypoint x="930" y="515" />
       </bpmndi:BPMNEdge>
@@ -405,6 +386,10 @@
       <bpmndi:BPMNEdge id="Flow_1wz57yu_di" bpmnElement="Flow_1wz57yu">
         <di:waypoint x="955" y="540" />
         <di:waypoint x="1050" y="540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ia3cv0_di" bpmnElement="Flow_0ia3cv0">
+        <di:waypoint x="1170" y="540" />
+        <di:waypoint x="1220" y="540" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Shape_Pool_Patient" bpmnElement="Pool_Patient" isHorizontal="true">
         <dc:Bounds x="160" y="780" width="1450" height="310" />
@@ -428,9 +413,6 @@
       <bpmndi:BPMNShape id="Shape_GW_P1_merge" bpmnElement="GW_P1_merge" isMarkerVisible="true">
         <dc:Bounds x="1425" y="910" width="50" height="50" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Shape_P3" bpmnElement="Task_P3">
-        <dc:Bounds x="1250" y="840" width="120" height="80" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Shape_GW_P1" bpmnElement="GW_P1" isMarkerVisible="true">
         <dc:Bounds x="1055" y="910" width="50" height="50" />
         <bpmndi:BPMNLabel>
@@ -449,16 +431,19 @@
       <bpmndi:BPMNShape id="Activity_1vk9mzi_di" bpmnElement="Activity_0qzg4o5">
         <dc:Bounds x="640" y="840" width="100" height="80" />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P3" bpmnElement="Task_P3">
+        <dc:Bounds x="1240" y="820" width="120" height="80" />
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Edge_sf_p1" bpmnElement="sf_p1">
         <di:waypoint x="258" y="935" />
         <di:waypoint x="310" y="935" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Edge_sf_p4_ja" bpmnElement="sf_p4_ja">
         <di:waypoint x="1080" y="910" />
-        <di:waypoint x="1080" y="880" />
-        <di:waypoint x="1250" y="880" />
+        <di:waypoint x="1080" y="860" />
+        <di:waypoint x="1240" y="860" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1094" y="893" width="12" height="14" />
+          <dc:Bounds x="1094" y="886" width="12" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Edge_sf_p4_nein" bpmnElement="sf_p4_nein">
@@ -471,8 +456,8 @@
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Edge_sf_p5" bpmnElement="sf_p5">
-        <di:waypoint x="1370" y="880" />
-        <di:waypoint x="1450" y="880" />
+        <di:waypoint x="1360" y="860" />
+        <di:waypoint x="1450" y="860" />
         <di:waypoint x="1450" y="910" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Edge_sf_p6" bpmnElement="sf_p6">
@@ -522,12 +507,12 @@
         <di:waypoint x="370" y="610" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Edge_DOA_S_Rezept" bpmnElement="DOA_S_Rezept">
-        <di:waypoint x="740" y="510" />
-        <di:waypoint x="740" y="535" />
+        <di:waypoint x="687" y="506" />
+        <di:waypoint x="715" y="524" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Edge_DOA_S_Termine" bpmnElement="DOA_S_Termine">
-        <di:waypoint x="1338" y="580" />
-        <di:waypoint x="1383" y="645" />
+        <di:waypoint x="1317" y="580" />
+        <di:waypoint x="1377" y="645" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Edge_MF1" bpmnElement="MF1">
         <di:waypoint x="1208" y="208" />
@@ -535,7 +520,7 @@
         <di:waypoint x="240" y="380" />
         <di:waypoint x="240" y="522" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="621" y="358" width="139" height="14" />
+          <dc:Bounds x="761" y="358" width="137" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Edge_MF2" bpmnElement="MF2">
@@ -544,23 +529,30 @@
         <di:waypoint x="240" y="700" />
         <di:waypoint x="240" y="917" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="571" y="666" width="169" height="27" />
+          <dc:Bounds x="578" y="666" width="155" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Edge_MF4" bpmnElement="MF4">
-        <di:waypoint x="1310" y="840" />
-        <di:waypoint x="1310" y="580" />
+        <di:waypoint x="1270" y="820" />
+        <di:waypoint x="1270" y="580" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1315" y="807" width="49" height="14" />
+          <dc:Bounds x="1285" y="745" width="49" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1lkh6lk_di" bpmnElement="Flow_1lkh6lk">
         <di:waypoint x="690" y="840" />
         <di:waypoint x="690" y="750" />
-        <di:waypoint x="1280" y="750" />
-        <di:waypoint x="1280" y="580" />
+        <di:waypoint x="1240" y="750" />
+        <di:waypoint x="1240" y="580" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="697" y="753" width="125" height="14" />
+          <dc:Bounds x="731" y="753" width="69" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0iwf0t4_di" bpmnElement="Flow_0iwf0t4">
+        <di:waypoint x="630" y="160" />
+        <di:waypoint x="630" y="430" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="638" y="292" width="35" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
