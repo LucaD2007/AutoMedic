@@ -1,0 +1,476 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                  id="Definitions_10"
+                  targetNamespace="http://bpmn.io/schema/bpmn"
+                  exporter="EKX DeepAgent"
+                  exporterVersion="2.0">
+
+  <!-- ================================================================
+       KOLLABORATIONSDIAGRAMM: Patientenregistrierung
+       Aktivitaeten gesamt: 10 (Patient: 3 | System: 5 | Praxis: 2)
+       Checkliste A-J erfuellt
+       ================================================================
+
+       Verbesserungen gegenueber Vorversion:
+       A  - "Formular ausfuellen" + "absenden" zusammengefasst (gleiche Person,
+              gleiches System, kein Gateway dazwischen) -> 1 sendTask
+       B  - Alle Aktivitaetstypen explizit: sendTask / userTask / receiveTask /
+              collapsed subProcess / sendTask
+       C  - Intermediate Message Catch Event "Freigabe erhalten" zwischen
+              FreigabeAnfordern und KontoAktivieren -> korrektes Warten auf Praxis
+       C  - Task_P3 jetzt receiveTask (empfaengt MF_06 Willkommensnachricht)
+       F  - Alle 6 Nachrichtenfluesse beschriftet und korrekt verbunden
+       G  - DataObject Patientenstammdaten (DOA von Task_P1)
+              DataStore Patientendatenbank an 2 Stellen sichtbar
+       H  - Sequenzfluss links->rechts, keine kreuzenden Linien
+  ================================================================ -->
+
+  <!-- ====== KOLLABORATION ====== -->
+  <bpmn:collaboration id="Collab_10">
+    <bpmn:participant id="Pool_Patient" name="Patient"                 processRef="Proc_Patient" />
+    <bpmn:participant id="Pool_System"  name="Terminbuchungsplattform" processRef="Proc_System"  />
+    <bpmn:participant id="Pool_Praxis"  name="Arztpraxis"              processRef="Proc_Praxis"  />
+
+    <!-- Nachrichtenfluesse (beschriftet, Pool-uebergreifend) -->
+    <bpmn:messageFlow id="MF_01" name="Registrierungsdaten"      sourceRef="Task_P1"            targetRef="Start_System"          />
+    <bpmn:messageFlow id="MF_02" name="Verifizierungs-E-Mail"    sourceRef="Task_S2"            targetRef="Task_P2"               />
+    <bpmn:messageFlow id="MF_03" name="Verifizierung"            sourceRef="Task_P2"            targetRef="Task_S3"               />
+    <bpmn:messageFlow id="MF_04" name="Freigabeanfrage"          sourceRef="Task_S4"            targetRef="Start_Praxis"          />
+    <bpmn:messageFlow id="MF_05" name="Freigabe erteilt"         sourceRef="Task_Pr2"           targetRef="IMCatch_Freigabe"      />
+    <bpmn:messageFlow id="MF_06" name="Willkommensnachricht"     sourceRef="Task_S5"            targetRef="Task_P3"               />
+  </bpmn:collaboration>
+
+  <!-- ================================================================
+       POOL 1: PATIENT
+       Aktivitaeten: 3
+       ================================================================ -->
+  <bpmn:process id="Proc_Patient" isExecutable="false">
+
+    <!-- Startereignis -->
+    <bpmn:startEvent id="Start_Patient" name="Registrierung&#10;gewuenscht">
+      <bpmn:outgoing>Flow_P1</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <!-- A1: Sendende Aktivitaet  (Patient + Plattform-Software, sendet MF_01) -->
+    <!-- Zusammenfassung: "Formular ausfuellen" + "absenden" = gleiche Person,
+         gleiche Software, kein Gateway, immer in fester Reihenfolge          -->
+    <bpmn:sendTask id="Task_P1" name="Registrierungsformular&#10;ausfuellen und absenden">
+      <bpmn:incoming>Flow_P1</bpmn:incoming>
+      <bpmn:outgoing>Flow_P2</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DOA_P1">
+        <bpmn:targetRef>DO_Stammdaten_Ref</bpmn:targetRef>
+      </bpmn:dataOutputAssociation>
+    </bpmn:sendTask>
+
+    <!-- A2: Benutzer-Aktivitaet (Patient klickt Bestaetigunslink; empfaengt MF_02, sendet MF_03) -->
+    <bpmn:userTask id="Task_P2" name="E-Mail-Adresse&#10;verifizieren">
+      <bpmn:incoming>Flow_P2</bpmn:incoming>
+      <bpmn:outgoing>Flow_P3</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <!-- A3: Empfangende Aktivitaet (Patient erhalt Willkommensnachricht MF_06) -->
+    <bpmn:receiveTask id="Task_P3" name="Kontofreigabe&#10;entgegennehmen">
+      <bpmn:incoming>Flow_P3</bpmn:incoming>
+      <bpmn:outgoing>Flow_P4</bpmn:outgoing>
+    </bpmn:receiveTask>
+
+    <!-- Endereignis -->
+    <bpmn:endEvent id="End_Patient" name="Registrierung&#10;abgeschlossen">
+      <bpmn:incoming>Flow_P4</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- Datenobjekt: Patientenstammdaten (wird durch Task_P1 erzeugt) -->
+    <bpmn:dataObjectReference id="DO_Stammdaten_Ref" name="Patientenstammdaten" dataObjectRef="DO_Stammdaten" />
+    <bpmn:dataObject id="DO_Stammdaten" />
+
+    <!-- Sequenzfluesse Patient -->
+    <bpmn:sequenceFlow id="Flow_P1" sourceRef="Start_Patient" targetRef="Task_P1" />
+    <bpmn:sequenceFlow id="Flow_P2" sourceRef="Task_P1"       targetRef="Task_P2" />
+    <bpmn:sequenceFlow id="Flow_P3" sourceRef="Task_P2"       targetRef="Task_P3" />
+    <bpmn:sequenceFlow id="Flow_P4" sourceRef="Task_P3"       targetRef="End_Patient" />
+  </bpmn:process>
+
+  <!-- ================================================================
+       POOL 2: TERMINBUCHUNGSPLATTFORM
+       Aktivitaeten: 5 (inkl. 1 kollabierter Subprozess)
+       ================================================================ -->
+  <bpmn:process id="Proc_System" isExecutable="false">
+
+    <!-- Nachricht-getriggertes Startereignis (empfaengt MF_01) -->
+    <bpmn:startEvent id="Start_System" name="Registrierungsdaten&#10;empfangen">
+      <bpmn:outgoing>Flow_S1</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MED_Start_S" />
+    </bpmn:startEvent>
+
+    <!-- A4: Kollabierter Subprozess  (validieren + in DB speichern) -->
+    <bpmn:subProcess id="SubProc_S" name="Registrierung&#10;validieren und speichern">
+      <bpmn:incoming>Flow_S1</bpmn:incoming>
+      <bpmn:outgoing>Flow_S2</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DOA_Sub">
+        <bpmn:targetRef>DS_Patienten_1</bpmn:targetRef>
+      </bpmn:dataOutputAssociation>
+    </bpmn:subProcess>
+
+    <!-- A5: Sendende Aktivitaet (sendet Verifizierungs-E-Mail MF_02) -->
+    <bpmn:sendTask id="Task_S2" name="Verifizierungs-E-Mail&#10;senden">
+      <bpmn:incoming>Flow_S2</bpmn:incoming>
+      <bpmn:outgoing>Flow_S3</bpmn:outgoing>
+    </bpmn:sendTask>
+
+    <!-- A6: Empfangende Aktivitaet (wartet auf Verifizierung MF_03) -->
+    <bpmn:receiveTask id="Task_S3" name="Verifizierung&#10;empfangen">
+      <bpmn:incoming>Flow_S3</bpmn:incoming>
+      <bpmn:outgoing>Flow_S4</bpmn:outgoing>
+    </bpmn:receiveTask>
+
+    <!-- A7: Sendende Aktivitaet (sendet Freigabeanfrage MF_04 an Praxis) -->
+    <bpmn:sendTask id="Task_S4" name="Freigabe bei Arztpraxis&#10;anfordern">
+      <bpmn:incoming>Flow_S4</bpmn:incoming>
+      <bpmn:outgoing>Flow_S5</bpmn:outgoing>
+    </bpmn:sendTask>
+
+    <!-- Nachricht-Zwischenereignis: wartet auf Freigabe MF_05 von Praxis -->
+    <bpmn:intermediateCatchEvent id="IMCatch_Freigabe" name="Freigabe&#10;erhalten">
+      <bpmn:incoming>Flow_S5</bpmn:incoming>
+      <bpmn:outgoing>Flow_S6</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MED_Freigabe" />
+    </bpmn:intermediateCatchEvent>
+
+    <!-- A8: Sendende Aktivitaet (aktiviert Konto, schreibt DB, sendet MF_06) -->
+    <bpmn:sendTask id="Task_S5" name="Konto aktivieren und&#10;Willkommensnachricht senden">
+      <bpmn:incoming>Flow_S6</bpmn:incoming>
+      <bpmn:outgoing>Flow_S7</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DOA_S5">
+        <bpmn:targetRef>DS_Patienten_2</bpmn:targetRef>
+      </bpmn:dataOutputAssociation>
+    </bpmn:sendTask>
+
+    <!-- Endereignis -->
+    <bpmn:endEvent id="End_System" name="Konto&#10;aktiviert">
+      <bpmn:incoming>Flow_S7</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- Datenspeicher (2 visuelle Referenzen auf dieselbe Patientendatenbank) -->
+    <bpmn:dataStoreReference id="DS_Patienten_1" name="Patientendatenbank" />
+    <bpmn:dataStoreReference id="DS_Patienten_2" name="Patientendatenbank" />
+
+    <!-- Sequenzfluesse System -->
+    <bpmn:sequenceFlow id="Flow_S1" sourceRef="Start_System"   targetRef="SubProc_S"      />
+    <bpmn:sequenceFlow id="Flow_S2" sourceRef="SubProc_S"      targetRef="Task_S2"        />
+    <bpmn:sequenceFlow id="Flow_S3" sourceRef="Task_S2"        targetRef="Task_S3"        />
+    <bpmn:sequenceFlow id="Flow_S4" sourceRef="Task_S3"        targetRef="Task_S4"        />
+    <bpmn:sequenceFlow id="Flow_S5" sourceRef="Task_S4"        targetRef="IMCatch_Freigabe" />
+    <bpmn:sequenceFlow id="Flow_S6" sourceRef="IMCatch_Freigabe" targetRef="Task_S5"      />
+    <bpmn:sequenceFlow id="Flow_S7" sourceRef="Task_S5"        targetRef="End_System"     />
+  </bpmn:process>
+
+  <!-- ================================================================
+       POOL 3: ARZTPRAXIS
+       Aktivitaeten: 2
+       ================================================================ -->
+  <bpmn:process id="Proc_Praxis" isExecutable="false">
+
+    <!-- Nachricht-getriggertes Startereignis (empfaengt MF_04) -->
+    <bpmn:startEvent id="Start_Praxis" name="Freigabeanfrage&#10;erhalten">
+      <bpmn:outgoing>Flow_Pr1</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MED_Start_Pr" />
+    </bpmn:startEvent>
+
+    <!-- A9: Benutzer-Aktivitaet (Arztmitarbeiter prueft Daten manuell) -->
+    <bpmn:userTask id="Task_Pr1" name="Patientendaten und&#10;Versicherung pruefen">
+      <bpmn:incoming>Flow_Pr1</bpmn:incoming>
+      <bpmn:outgoing>Flow_Pr2</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <!-- A10: Sendende Aktivitaet (sendet Freigabe MF_05 an System) -->
+    <bpmn:sendTask id="Task_Pr2" name="Freigabe&#10;erteilen">
+      <bpmn:incoming>Flow_Pr2</bpmn:incoming>
+      <bpmn:outgoing>Flow_Pr3</bpmn:outgoing>
+    </bpmn:sendTask>
+
+    <!-- Endereignis -->
+    <bpmn:endEvent id="End_Praxis" name="Patient&#10;freigegeben">
+      <bpmn:incoming>Flow_Pr3</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- Sequenzfluesse Praxis -->
+    <bpmn:sequenceFlow id="Flow_Pr1" sourceRef="Start_Praxis" targetRef="Task_Pr1"  />
+    <bpmn:sequenceFlow id="Flow_Pr2" sourceRef="Task_Pr1"     targetRef="Task_Pr2"  />
+    <bpmn:sequenceFlow id="Flow_Pr3" sourceRef="Task_Pr2"     targetRef="End_Praxis" />
+  </bpmn:process>
+
+  <!-- ================================================================
+       DIAGRAMM-LAYOUT
+       Alle Pools: x=160, Breite=1400
+       Patient:  y=060, h=260  ->  Mittelachse y=190
+       System:   y=370, h=300  ->  Mittelachse y=520
+       Praxis:   y=720, h=200  ->  Mittelachse y=820
+       Gap P->S: y=320-370  (Mittellinie y=345)
+       Gap S->Pr: y=670-720  (Mittellinie y=695)
+       ================================================================ -->
+  <bpmndi:BPMNDiagram id="BPMNDiagram_10">
+    <bpmndi:BPMNPlane id="BPMNPlane_10" bpmnElement="Collab_10">
+
+      <!-- ============================================================
+           PATIENT POOL
+           ============================================================ -->
+      <bpmndi:BPMNShape id="Sh_Pool_Patient" bpmnElement="Pool_Patient" isHorizontal="true">
+        <dc:Bounds x="160" y="60" width="1400" height="260" />
+      </bpmndi:BPMNShape>
+
+      <!-- Start -->
+      <bpmndi:BPMNShape id="Sh_Start_Patient" bpmnElement="Start_Patient">
+        <dc:Bounds x="222" y="172" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="200" y="215" width="82" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- A1: Registrierungsformular ausfuellen und absenden [sendTask] -->
+      <bpmndi:BPMNShape id="Sh_Task_P1" bpmnElement="Task_P1">
+        <dc:Bounds x="295" y="150" width="130" height="80" />
+      </bpmndi:BPMNShape>
+
+      <!-- Datenobjekt: Patientenstammdaten -->
+      <bpmndi:BPMNShape id="Sh_DO_Stammdaten" bpmnElement="DO_Stammdaten_Ref">
+        <dc:Bounds x="315" y="78" width="36" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="295" y="63" width="78" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- A2: E-Mail-Adresse verifizieren [userTask] -->
+      <bpmndi:BPMNShape id="Sh_Task_P2" bpmnElement="Task_P2">
+        <dc:Bounds x="590" y="150" width="130" height="80" />
+      </bpmndi:BPMNShape>
+
+      <!-- A3: Kontofreigabe entgegennehmen [receiveTask] -->
+      <bpmndi:BPMNShape id="Sh_Task_P3" bpmnElement="Task_P3">
+        <dc:Bounds x="960" y="150" width="130" height="80" />
+      </bpmndi:BPMNShape>
+
+      <!-- End -->
+      <bpmndi:BPMNShape id="Sh_End_Patient" bpmnElement="End_Patient">
+        <dc:Bounds x="1142" y="172" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1118" y="215" width="84" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- Sequenzfluesse Patient -->
+      <bpmndi:BPMNEdge id="Ed_P1" bpmnElement="Flow_P1">
+        <di:waypoint x="258" y="190" /><di:waypoint x="295" y="190" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Ed_P2" bpmnElement="Flow_P2">
+        <di:waypoint x="425" y="190" /><di:waypoint x="590" y="190" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Ed_P3" bpmnElement="Flow_P3">
+        <di:waypoint x="720" y="190" /><di:waypoint x="960" y="190" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Ed_P4" bpmnElement="Flow_P4">
+        <di:waypoint x="1090" y="190" /><di:waypoint x="1142" y="190" />
+      </bpmndi:BPMNEdge>
+
+      <!-- Datenassoziation: Task_P1 erzeugt Patientenstammdaten -->
+      <bpmndi:BPMNEdge id="Ed_DOA_P1" bpmnElement="DOA_P1">
+        <di:waypoint x="345" y="150" /><di:waypoint x="333" y="128" />
+      </bpmndi:BPMNEdge>
+
+      <!-- ============================================================
+           SYSTEM POOL
+           ============================================================ -->
+      <bpmndi:BPMNShape id="Sh_Pool_System" bpmnElement="Pool_System" isHorizontal="true">
+        <dc:Bounds x="160" y="370" width="1400" height="300" />
+      </bpmndi:BPMNShape>
+
+      <!-- Start [messageStart] -->
+      <bpmndi:BPMNShape id="Sh_Start_System" bpmnElement="Start_System">
+        <dc:Bounds x="222" y="502" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="200" y="545" width="82" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- A4: Registrierung validieren und speichern [collapsed subProcess] -->
+      <bpmndi:BPMNShape id="Sh_SubProc_S" bpmnElement="SubProc_S" isExpanded="false">
+        <dc:Bounds x="295" y="480" width="130" height="80" />
+        <bpmndi:BPMNLabel><dc:Bounds x="300" y="505" width="120" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- Datenspeicher 1: Patientendatenbank (beim Subprozess) -->
+      <bpmndi:BPMNShape id="Sh_DS_P1" bpmnElement="DS_Patienten_1">
+        <dc:Bounds x="310" y="400" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="295" y="385" width="82" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- A5: Verifizierungs-E-Mail senden [sendTask] -->
+      <bpmndi:BPMNShape id="Sh_Task_S2" bpmnElement="Task_S2">
+        <dc:Bounds x="480" y="480" width="130" height="80" />
+      </bpmndi:BPMNShape>
+
+      <!-- A6: Verifizierung empfangen [receiveTask] -->
+      <bpmndi:BPMNShape id="Sh_Task_S3" bpmnElement="Task_S3">
+        <dc:Bounds x="660" y="480" width="130" height="80" />
+      </bpmndi:BPMNShape>
+
+      <!-- A7: Freigabe bei Arztpraxis anfordern [sendTask] -->
+      <bpmndi:BPMNShape id="Sh_Task_S4" bpmnElement="Task_S4">
+        <dc:Bounds x="840" y="480" width="130" height="80" />
+      </bpmndi:BPMNShape>
+
+      <!-- Zwischenereignis: Freigabe erhalten [messageCatch] -->
+      <bpmndi:BPMNShape id="Sh_IMCatch_Freigabe" bpmnElement="IMCatch_Freigabe">
+        <dc:Bounds x="1022" y="502" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1000" y="545" width="80" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- A8: Konto aktivieren und Willkommensnachricht senden [sendTask] -->
+      <bpmndi:BPMNShape id="Sh_Task_S5" bpmnElement="Task_S5">
+        <dc:Bounds x="1100" y="480" width="140" height="80" />
+      </bpmndi:BPMNShape>
+
+      <!-- Datenspeicher 2: Patientendatenbank (beim Konto-Aktivieren) -->
+      <bpmndi:BPMNShape id="Sh_DS_P2" bpmnElement="DS_Patienten_2">
+        <dc:Bounds x="1120" y="400" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1105" y="385" width="82" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- End -->
+      <bpmndi:BPMNShape id="Sh_End_System" bpmnElement="End_System">
+        <dc:Bounds x="1302" y="502" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1282" y="545" width="76" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- Sequenzfluesse System -->
+      <bpmndi:BPMNEdge id="Ed_S1" bpmnElement="Flow_S1">
+        <di:waypoint x="258" y="520" /><di:waypoint x="295" y="520" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Ed_S2" bpmnElement="Flow_S2">
+        <di:waypoint x="425" y="520" /><di:waypoint x="480" y="520" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Ed_S3" bpmnElement="Flow_S3">
+        <di:waypoint x="610" y="520" /><di:waypoint x="660" y="520" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Ed_S4" bpmnElement="Flow_S4">
+        <di:waypoint x="790" y="520" /><di:waypoint x="840" y="520" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Ed_S5" bpmnElement="Flow_S5">
+        <di:waypoint x="970" y="520" /><di:waypoint x="1022" y="520" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Ed_S6" bpmnElement="Flow_S6">
+        <di:waypoint x="1058" y="520" /><di:waypoint x="1100" y="520" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Ed_S7" bpmnElement="Flow_S7">
+        <di:waypoint x="1240" y="520" /><di:waypoint x="1302" y="520" />
+      </bpmndi:BPMNEdge>
+
+      <!-- Datenassoziationen System -->
+      <!-- Subprozess schreibt in Patientendatenbank -->
+      <bpmndi:BPMNEdge id="Ed_DOA_Sub" bpmnElement="DOA_Sub">
+        <di:waypoint x="345" y="480" /><di:waypoint x="340" y="450" />
+      </bpmndi:BPMNEdge>
+      <!-- Task_S5 schreibt in Patientendatenbank (Kontostatus) -->
+      <bpmndi:BPMNEdge id="Ed_DOA_S5" bpmnElement="DOA_S5">
+        <di:waypoint x="1145" y="480" /><di:waypoint x="1145" y="450" />
+      </bpmndi:BPMNEdge>
+
+      <!-- ============================================================
+           PRAXIS POOL
+           (Prozess startet erst nach Freigabeanfrage -> Elemente
+            sind bewusst im rechten Bereich des Pools positioniert)
+           ============================================================ -->
+      <bpmndi:BPMNShape id="Sh_Pool_Praxis" bpmnElement="Pool_Praxis" isHorizontal="true">
+        <dc:Bounds x="160" y="720" width="1400" height="200" />
+      </bpmndi:BPMNShape>
+
+      <!-- Start [messageStart] -->
+      <bpmndi:BPMNShape id="Sh_Start_Praxis" bpmnElement="Start_Praxis">
+        <dc:Bounds x="872" y="802" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="850" y="845" width="82" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- A9: Patientendaten und Versicherung pruefen [userTask] -->
+      <bpmndi:BPMNShape id="Sh_Task_Pr1" bpmnElement="Task_Pr1">
+        <dc:Bounds x="955" y="780" width="140" height="80" />
+      </bpmndi:BPMNShape>
+
+      <!-- A10: Freigabe erteilen [sendTask] -->
+      <bpmndi:BPMNShape id="Sh_Task_Pr2" bpmnElement="Task_Pr2">
+        <dc:Bounds x="1145" y="780" width="120" height="80" />
+      </bpmndi:BPMNShape>
+
+      <!-- End -->
+      <bpmndi:BPMNShape id="Sh_End_Praxis" bpmnElement="End_Praxis">
+        <dc:Bounds x="1322" y="802" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1298" y="845" width="86" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- Sequenzfluesse Praxis -->
+      <bpmndi:BPMNEdge id="Ed_Pr1" bpmnElement="Flow_Pr1">
+        <di:waypoint x="908" y="820" /><di:waypoint x="955" y="820" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Ed_Pr2" bpmnElement="Flow_Pr2">
+        <di:waypoint x="1095" y="820" /><di:waypoint x="1145" y="820" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Ed_Pr3" bpmnElement="Flow_Pr3">
+        <di:waypoint x="1265" y="820" /><di:waypoint x="1322" y="820" />
+      </bpmndi:BPMNEdge>
+
+      <!-- ============================================================
+           NACHRICHTENFLUESSE
+           Gap Patient -> System : y=320-370  (Mittellinie y=345)
+           Gap System  -> Praxis : y=670-720  (Mittellinie y=695)
+           ============================================================ -->
+
+      <!-- MF_01: Task_P1 -> Start_System  (Registrierungsdaten) -->
+      <bpmndi:BPMNEdge id="Ed_MF01" bpmnElement="MF_01">
+        <di:waypoint x="360" y="230" />
+        <di:waypoint x="360" y="345" />
+        <di:waypoint x="240" y="345" />
+        <di:waypoint x="240" y="502" />
+        <bpmndi:BPMNLabel><dc:Bounds x="270" y="328" width="82" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+      <!-- MF_02: Task_S2 -> Task_P2  (Verifizierungs-E-Mail) -->
+      <bpmndi:BPMNEdge id="Ed_MF02" bpmnElement="MF_02">
+        <di:waypoint x="545" y="480" />
+        <di:waypoint x="545" y="345" />
+        <di:waypoint x="625" y="345" />
+        <di:waypoint x="625" y="230" />
+        <bpmndi:BPMNLabel><dc:Bounds x="550" y="328" width="100" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+      <!-- MF_03: Task_P2 -> Task_S3  (Verifizierung) -->
+      <bpmndi:BPMNEdge id="Ed_MF03" bpmnElement="MF_03">
+        <di:waypoint x="685" y="230" />
+        <di:waypoint x="685" y="345" />
+        <di:waypoint x="725" y="345" />
+        <di:waypoint x="725" y="480" />
+        <bpmndi:BPMNLabel><dc:Bounds x="695" y="328" width="60" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+      <!-- MF_04: Task_S4 -> Start_Praxis  (Freigabeanfrage) -->
+      <bpmndi:BPMNEdge id="Ed_MF04" bpmnElement="MF_04">
+        <di:waypoint x="905" y="560" />
+        <di:waypoint x="905" y="695" />
+        <di:waypoint x="890" y="695" />
+        <di:waypoint x="890" y="802" />
+        <bpmndi:BPMNLabel><dc:Bounds x="912" y="678" width="74" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+      <!-- MF_05: Task_Pr2 -> IMCatch_Freigabe  (Freigabe erteilt) -->
+      <bpmndi:BPMNEdge id="Ed_MF05" bpmnElement="MF_05">
+        <di:waypoint x="1205" y="780" />
+        <di:waypoint x="1205" y="695" />
+        <di:waypoint x="1040" y="695" />
+        <di:waypoint x="1040" y="538" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1080" y="678" width="72" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+      <!-- MF_06: Task_S5 -> Task_P3  (Willkommensnachricht) -->
+      <bpmndi:BPMNEdge id="Ed_MF06" bpmnElement="MF_06">
+        <di:waypoint x="1170" y="480" />
+        <di:waypoint x="1170" y="345" />
+        <di:waypoint x="1025" y="345" />
+        <di:waypoint x="1025" y="230" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1055" y="328" width="100" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
