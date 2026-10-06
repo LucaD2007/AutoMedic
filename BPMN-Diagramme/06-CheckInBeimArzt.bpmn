@@ -46,8 +46,6 @@
       <bpmn:outgoing>Flow_S1</bpmn:outgoing>
       <bpmn:messageEventDefinition id="MED_Start_S" />
     </bpmn:startEvent>
-    <bpmn:dataStoreReference id="DataStore_Terminkalender" name="Terminkalender" />
-    <bpmn:dataStoreReference id="DataStore_Patienten" name="Patientendatenbank" />
     <bpmn:subProcess id="Task_S_Validieren" name="Check-In-Daten validieren">
       <bpmn:incoming>Flow_S1</bpmn:incoming>
       <bpmn:outgoing>Flow_S2</bpmn:outgoing>
@@ -64,7 +62,7 @@
         <bpmn:targetRef>DataStore_Patienten</bpmn:targetRef>
       </bpmn:dataOutputAssociation>
     </bpmn:task>
-    <bpmn:sendTask id="Task_S_PraxisBenachrichtigen" name="Praxis ueber Ankunft benachrichtigen">
+    <bpmn:sendTask id="Task_S_PraxisBenachrichtigen" name="Praxis über Ankunft benachrichtigen">
       <bpmn:incoming>Flow_S3</bpmn:incoming>
       <bpmn:outgoing>Flow_S4</bpmn:outgoing>
     </bpmn:sendTask>
@@ -80,6 +78,8 @@
     <bpmn:sequenceFlow id="Flow_S3" sourceRef="Task_S_AnwesendMarkieren" targetRef="Task_S_PraxisBenachrichtigen" />
     <bpmn:sequenceFlow id="Flow_S4" sourceRef="Task_S_PraxisBenachrichtigen" targetRef="Task_S_AufrufWeiterleiten" />
     <bpmn:sequenceFlow id="Flow_S5" sourceRef="Task_S_AufrufWeiterleiten" targetRef="End_System" />
+    <bpmn:dataStoreReference id="DataStore_Patienten" name="Patientendatenbank" />
+    <bpmn:dataStoreReference id="DataStore_Terminkalender" name="Terminkalender" />
   </bpmn:process>
   <bpmn:process id="Process_Praxis" isExecutable="false">
     <bpmn:startEvent id="Start_Praxis" name="Ankunftsbenachrichtigung erhalten">
@@ -155,7 +155,7 @@
         <di:waypoint x="1082" y="260" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Shape_Pool_System" bpmnElement="Pool_System" isHorizontal="true">
-        <dc:Bounds x="160" y="410" width="1000" height="260" />
+        <dc:Bounds x="160" y="410" width="1000" height="290" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Shape_Start_System" bpmnElement="Start_System">
         <dc:Bounds x="222" y="512" width="36" height="36" />
@@ -163,16 +163,16 @@
           <dc:Bounds x="202" y="555" width="78" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Shape_DS_Kalender" bpmnElement="DataStore_Terminkalender">
-        <dc:Bounds x="335" y="595" width="50" height="50" />
+      <bpmndi:BPMNShape id="Shape_DS_Patienten" bpmnElement="DataStore_Patienten">
+        <dc:Bounds x="515" y="625" width="50" height="50" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="322" y="645" width="76" height="14" />
+          <dc:Bounds x="500" y="675" width="98" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Shape_DS_Patienten" bpmnElement="DataStore_Patienten">
-        <dc:Bounds x="515" y="595" width="50" height="50" />
+      <bpmndi:BPMNShape id="Shape_DS_Kalender" bpmnElement="DataStore_Terminkalender">
+        <dc:Bounds x="335" y="625" width="50" height="50" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="497" y="645" width="103" height="14" />
+          <dc:Bounds x="322" y="675" width="76" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Shape_S_Validieren" bpmnElement="Task_S_Validieren">
@@ -183,6 +183,7 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Shape_S_PraxisBenachrichtigen" bpmnElement="Task_S_PraxisBenachrichtigen">
         <dc:Bounds x="660" y="490" width="130" height="80" />
+        <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Shape_S_AufrufWeiterleiten" bpmnElement="Task_S_AufrufWeiterleiten">
         <dc:Bounds x="900" y="490" width="130" height="80" />
@@ -258,12 +259,12 @@
         <di:waypoint x="360" y="220" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Edge_DIA_S1" bpmnElement="DIA_S1">
-        <di:waypoint x="360" y="595" />
+        <di:waypoint x="360" y="625" />
         <di:waypoint x="360" y="570" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Edge_DOA_S1" bpmnElement="DOA_S1">
         <di:waypoint x="540" y="570" />
-        <di:waypoint x="540" y="595" />
+        <di:waypoint x="540" y="625" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Edge_MF01" bpmnElement="MF_01">
         <di:waypoint x="360" y="300" />
