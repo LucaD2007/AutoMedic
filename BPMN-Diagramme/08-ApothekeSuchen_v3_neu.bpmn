@@ -9,9 +9,9 @@
     <bpmn:messageFlow id="MF3" name="Apothekenwahl" sourceRef="T_P2" targetRef="T_S3" />
     <bpmn:messageFlow id="MF4" name="Detailinformationen" sourceRef="T_S3" targetRef="T_P3" />
     <bpmn:messageFlow id="MF5" name="Verfuegbarkeitsanfrage" sourceRef="T_S2" targetRef="T_A1" />
-    <bpmn:messageFlow id="MF6" name="Bestandsrueckmeldung" sourceRef="T_A1" targetRef="T_S2" />
+    <bpmn:messageFlow id="MF6" name="Bestandsrückmeldung" sourceRef="T_A1" targetRef="T_S2" />
     <bpmn:messageFlow id="MF7" name="Reservierungsanfrage" sourceRef="T_S4" targetRef="ICE_A1" />
-    <bpmn:messageFlow id="MF8" name="Reservierungsbestaetigung" sourceRef="T_A2" targetRef="T_S4" />
+    <bpmn:messageFlow id="MF8" name="Reservierungsbestätigung" sourceRef="T_A2" targetRef="T_S4" />
   </bpmn:collaboration>
   <bpmn:process id="Proc_Patient" isExecutable="false">
     <bpmn:startEvent id="Start_P" name="Medikament / Apotheke benoetigt">
@@ -21,7 +21,7 @@
       <bpmn:incoming>fp1</bpmn:incoming>
       <bpmn:outgoing>fp2</bpmn:outgoing>
     </bpmn:sendTask>
-    <bpmn:userTask id="T_P2" name="Apotheke aus Ergebnisliste auswaehlen">
+    <bpmn:userTask id="T_P2" name="Apotheke aus Ergebnisliste auswählen">
       <bpmn:incoming>fp2</bpmn:incoming>
       <bpmn:outgoing>fp3</bpmn:outgoing>
     </bpmn:userTask>
@@ -65,7 +65,7 @@
       <bpmn:outgoing>fs1</bpmn:outgoing>
       <bpmn:messageEventDefinition id="MED_StartS" />
     </bpmn:startEvent>
-    <bpmn:serviceTask id="T_S1" name="Apothekensuche durchfuehren">
+    <bpmn:serviceTask id="T_S1" name="Apothekensuche durchführen">
       <bpmn:incoming>fs1</bpmn:incoming>
       <bpmn:outgoing>fs2</bpmn:outgoing>
       <bpmn:property id="Prop_DS1" name="__targetRef_placeholder" />
@@ -86,15 +86,6 @@
     <bpmn:endEvent id="End_S_leer" name="Suche ohne Ergebnis beendet">
       <bpmn:incoming>fs3b</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:sendTask id="T_S2" name="Verfuegbarkeit pruefen und Ergebnisse senden">
-      <bpmn:incoming>fs3_Ja</bpmn:incoming>
-      <bpmn:outgoing>fs4</bpmn:outgoing>
-      <bpmn:property id="Prop_DS2" name="__targetRef_placeholder" />
-      <bpmn:dataInputAssociation id="DIA_S2">
-        <bpmn:sourceRef>DSR_Medikamente</bpmn:sourceRef>
-        <bpmn:targetRef>Prop_DS2</bpmn:targetRef>
-      </bpmn:dataInputAssociation>
-    </bpmn:sendTask>
     <bpmn:serviceTask id="T_S3" name="Apothekendetails bereitstellen">
       <bpmn:incoming>fs4</bpmn:incoming>
       <bpmn:outgoing>fs5</bpmn:outgoing>
@@ -113,7 +104,6 @@
       <bpmn:incoming>fs8</bpmn:incoming>
     </bpmn:endEvent>
     <bpmn:dataStoreReference id="DSR_Apotheken" name="Apothekendatenbank" />
-    <bpmn:dataStoreReference id="DSR_Medikamente" name="Medikamentenbestand" />
     <bpmn:serviceTask id="T_S4" name="Reservierung vermitteln">
       <bpmn:incoming>fs6_Ja</bpmn:incoming>
       <bpmn:outgoing>fs7</bpmn:outgoing>
@@ -129,13 +119,23 @@
     <bpmn:sequenceFlow id="fs6_Nein" name="Nein" sourceRef="GW_S2" targetRef="GW_S_Merge" />
     <bpmn:sequenceFlow id="fs7" sourceRef="T_S4" targetRef="GW_S_Merge" />
     <bpmn:sequenceFlow id="fs8" sourceRef="GW_S_Merge" targetRef="End_S" />
+    <bpmn:sendTask id="T_S2" name="Verfügbarkeit prüfen und Ergebnisse senden">
+      <bpmn:incoming>fs3_Ja</bpmn:incoming>
+      <bpmn:outgoing>fs4</bpmn:outgoing>
+      <bpmn:property id="Prop_DS2" name="__targetRef_placeholder" />
+      <bpmn:dataInputAssociation id="DIA_S2">
+        <bpmn:sourceRef>DSR_Medikamente</bpmn:sourceRef>
+        <bpmn:targetRef>Prop_DS2</bpmn:targetRef>
+      </bpmn:dataInputAssociation>
+    </bpmn:sendTask>
+    <bpmn:dataStoreReference id="DSR_Medikamente" name="Medikamentenbestand" />
   </bpmn:process>
   <bpmn:process id="Proc_Apotheke" isExecutable="false">
-    <bpmn:startEvent id="Start_A" name="Verfuegbarkeitsanfrage erhalten">
+    <bpmn:startEvent id="Start_A" name="Verfügbarkeitsanfrage erhalten">
       <bpmn:outgoing>fa1</bpmn:outgoing>
       <bpmn:messageEventDefinition id="MED_StartA" />
     </bpmn:startEvent>
-    <bpmn:serviceTask id="T_A1" name="Medikamentenverfuegbarkeit rueckmelden">
+    <bpmn:serviceTask id="T_A1" name="Medikamentenverfügbarkeit rückmelden">
       <bpmn:incoming>fa1</bpmn:incoming>
       <bpmn:outgoing>fa2</bpmn:outgoing>
       <bpmn:property id="Prop_DSA" name="__targetRef_placeholder" />
@@ -149,12 +149,12 @@
       <bpmn:outgoing>fa3</bpmn:outgoing>
       <bpmn:messageEventDefinition id="MED_ICE_A" />
     </bpmn:intermediateCatchEvent>
-    <bpmn:exclusiveGateway id="GW_A1" name="Medikament noch verfuegbar?">
+    <bpmn:exclusiveGateway id="GW_A1" name="Medikament noch verfügbar?">
       <bpmn:incoming>fa3</bpmn:incoming>
       <bpmn:outgoing>fa4_Ja</bpmn:outgoing>
       <bpmn:outgoing>fa4_Nein</bpmn:outgoing>
     </bpmn:exclusiveGateway>
-    <bpmn:serviceTask id="T_A2" name="Medikament reservieren und bestaetigen">
+    <bpmn:serviceTask id="T_A2" name="Medikament reservieren und bestätigen">
       <bpmn:incoming>fa4_Ja</bpmn:incoming>
       <bpmn:outgoing>fa5</bpmn:outgoing>
       <bpmn:dataOutputAssociation id="DOA_A1">
@@ -168,13 +168,13 @@
       <bpmn:incoming>fa4_Nein</bpmn:incoming>
       <bpmn:messageEventDefinition id="MED_A_Abbruch" />
     </bpmn:endEvent>
-    <bpmn:dataStoreReference id="DSR_Bestand" name="Lagerbestand" />
     <bpmn:sequenceFlow id="fa1" sourceRef="Start_A" targetRef="T_A1" />
     <bpmn:sequenceFlow id="fa2" sourceRef="T_A1" targetRef="ICE_A1" />
     <bpmn:sequenceFlow id="fa3" sourceRef="ICE_A1" targetRef="GW_A1" />
     <bpmn:sequenceFlow id="fa4_Ja" name="Ja" sourceRef="GW_A1" targetRef="T_A2" />
     <bpmn:sequenceFlow id="fa4_Nein" name="Nein" sourceRef="GW_A1" targetRef="End_A_abbruch" />
     <bpmn:sequenceFlow id="fa5" sourceRef="T_A2" targetRef="End_A" />
+    <bpmn:dataStoreReference id="DSR_Bestand" name="Lagerbestand" />
   </bpmn:process>
   <bpmndi:BPMNDiagram id="Diagram_08">
     <bpmndi:BPMNPlane id="Plane_08" bpmnElement="Collab_08">
@@ -192,6 +192,7 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="S_TP2" bpmnElement="T_P2">
         <dc:Bounds x="490" y="150" width="100" height="80" />
+        <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="S_TP3" bpmnElement="T_P3">
         <dc:Bounds x="660" y="150" width="100" height="80" />
@@ -272,11 +273,12 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="S_TS1" bpmnElement="T_S1">
         <dc:Bounds x="320" y="460" width="100" height="80" />
+        <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="S_GWS1" bpmnElement="GW_S1" isMarkerVisible="true">
         <dc:Bounds x="465" y="475" width="50" height="50" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="464" y="525" width="53" height="27" />
+          <dc:Bounds x="463" y="437.5" width="53" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="S_TSH" bpmnElement="T_S_Hinweis">
@@ -287,9 +289,6 @@
         <bpmndi:BPMNLabel>
           <dc:Bounds x="557" y="618" width="87" height="27" />
         </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="S_TS2" bpmnElement="T_S2">
-        <dc:Bounds x="560" y="460" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="S_TS3" bpmnElement="T_S3">
         <dc:Bounds x="720" y="460" width="100" height="80" />
@@ -315,14 +314,18 @@
           <dc:Bounds x="302" y="625" width="87" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="S_DSM" bpmnElement="DSR_Medikamente">
-        <dc:Bounds x="695" y="555" width="50" height="50" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="677" y="606" width="85" height="27" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="S_TS4" bpmnElement="T_S4">
         <dc:Bounds x="970" y="460" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_TS2" bpmnElement="T_S2">
+        <dc:Bounds x="590" y="460" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_DSM" bpmnElement="DSR_Medikamente">
+        <dc:Bounds x="725" y="555" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="707" y="606" width="85" height="27" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="E_fs1" bpmnElement="fs1">
         <di:waypoint x="268" y="500" />
@@ -334,9 +337,9 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="E_fs3Ja" bpmnElement="fs3_Ja">
         <di:waypoint x="515" y="500" />
-        <di:waypoint x="560" y="500" />
+        <di:waypoint x="590" y="500" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="532" y="475" width="12" height="14" />
+          <dc:Bounds x="547" y="475" width="12" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="E_fs3Nein" bpmnElement="fs3_Nein">
@@ -351,7 +354,7 @@
         <di:waypoint x="582" y="600" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="E_fs4" bpmnElement="fs4">
-        <di:waypoint x="660" y="500" />
+        <di:waypoint x="690" y="500" />
         <di:waypoint x="720" y="500" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="E_fs5" bpmnElement="fs5">
@@ -383,81 +386,91 @@
         <di:waypoint x="1225" y="500" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="S_Pool_A" bpmnElement="Pool_Apotheke" isHorizontal="true">
-        <dc:Bounds x="160" y="730" width="1440" height="230" />
+        <dc:Bounds x="160" y="730" width="1440" height="300" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="S_StartA" bpmnElement="Start_A">
-        <dc:Bounds x="232" y="827" width="36" height="36" />
+        <dc:Bounds x="532" y="817" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="206" y="863" width="89" height="27" />
+          <dc:Bounds x="508" y="853" width="86" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="S_TA1" bpmnElement="T_A1">
-        <dc:Bounds x="320" y="805" width="100" height="80" />
+        <dc:Bounds x="620" y="795" width="100" height="80" />
+        <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="S_ICEA" bpmnElement="ICE_A1">
-        <dc:Bounds x="482" y="827" width="36" height="36" />
+        <dc:Bounds x="782" y="817" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="457" y="863" width="87" height="27" />
+          <dc:Bounds x="757" y="853" width="87" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="S_GWA1" bpmnElement="GW_A1" isMarkerVisible="true">
-        <dc:Bounds x="575" y="820" width="50" height="50" />
+        <dc:Bounds x="875" y="810" width="50" height="50" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="557" y="870" width="87" height="27" />
+          <dc:Bounds x="857" y="860" width="87" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="S_TA2" bpmnElement="T_A2">
-        <dc:Bounds x="680" y="770" width="100" height="80" />
+        <dc:Bounds x="980" y="760" width="100" height="80" />
+        <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="S_EndA" bpmnElement="End_A">
-        <dc:Bounds x="832" y="792" width="36" height="36" />
+        <dc:Bounds x="1132" y="782" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="813" y="828" width="74" height="27" />
+          <dc:Bounds x="1113" y="818" width="74" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="S_EndAx" bpmnElement="End_A_abbruch">
-        <dc:Bounds x="682" y="910" width="36" height="36" />
+        <dc:Bounds x="982" y="900" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="667" y="946" width="66" height="27" />
+          <dc:Bounds x="967" y="936" width="66" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="S_DSB" bpmnElement="DSR_Bestand">
-        <dc:Bounds x="345" y="900" width="50" height="50" />
+        <dc:Bounds x="645" y="945" width="50" height="50" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="336" y="950" width="68" height="14" />
+          <dc:Bounds x="636" y="995" width="68" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="E_fa1" bpmnElement="fa1">
-        <di:waypoint x="268" y="845" />
-        <di:waypoint x="320" y="845" />
+        <di:waypoint x="568" y="835" />
+        <di:waypoint x="620" y="835" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="E_fa2" bpmnElement="fa2">
-        <di:waypoint x="420" y="845" />
-        <di:waypoint x="482" y="845" />
+        <di:waypoint x="720" y="835" />
+        <di:waypoint x="782" y="835" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="E_fa3" bpmnElement="fa3">
-        <di:waypoint x="518" y="845" />
-        <di:waypoint x="575" y="845" />
+        <di:waypoint x="818" y="835" />
+        <di:waypoint x="875" y="835" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="E_fa4Ja" bpmnElement="fa4_Ja">
-        <di:waypoint x="600" y="820" />
-        <di:waypoint x="600" y="810" />
-        <di:waypoint x="680" y="810" />
+        <di:waypoint x="900" y="810" />
+        <di:waypoint x="900" y="800" />
+        <di:waypoint x="980" y="800" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="609" y="793" width="12" height="14" />
+          <dc:Bounds x="909" y="783" width="12" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="E_fa4Nein" bpmnElement="fa4_Nein">
-        <di:waypoint x="600" y="870" />
-        <di:waypoint x="600" y="928" />
-        <di:waypoint x="682" y="928" />
+        <di:waypoint x="900" y="860" />
+        <di:waypoint x="900" y="918" />
+        <di:waypoint x="982" y="918" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="604" y="903" width="23" height="14" />
+          <dc:Bounds x="904" y="893" width="23" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="E_fa5" bpmnElement="fa5">
-        <di:waypoint x="780" y="810" />
-        <di:waypoint x="832" y="810" />
+        <di:waypoint x="1080" y="800" />
+        <di:waypoint x="1132" y="800" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_DIA_S1" bpmnElement="DIA_S1">
+        <di:waypoint x="345" y="575" />
+        <di:waypoint x="370" y="540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_DIA_S2" bpmnElement="DIA_S2">
+        <di:waypoint x="725" y="562" />
+        <di:waypoint x="688" y="535" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="E_MF1" bpmnElement="MF1">
         <di:waypoint x="370" y="230" />
@@ -469,12 +482,12 @@
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="E_MF2" bpmnElement="MF2">
-        <di:waypoint x="610" y="460" />
-        <di:waypoint x="610" y="340" />
+        <di:waypoint x="640" y="460" />
+        <di:waypoint x="640" y="340" />
         <di:waypoint x="540" y="340" />
         <di:waypoint x="540" y="230" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="544" y="315" width="63" height="14" />
+          <dc:Bounds x="468" y="312" width="63" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="E_MF3" bpmnElement="MF3">
@@ -483,7 +496,7 @@
         <di:waypoint x="770" y="330" />
         <di:waypoint x="770" y="460" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="622" y="305" width="76" height="14" />
+          <dc:Bounds x="682" y="383" width="76" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="E_MF4" bpmnElement="MF4">
@@ -492,61 +505,47 @@
         <di:waypoint x="720" y="340" />
         <di:waypoint x="720" y="230" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="709" y="315" width="83" height="27" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="E_DIA_S1" bpmnElement="DIA_S1">
-        <di:waypoint x="345" y="575" />
-        <di:waypoint x="370" y="540" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="E_DIA_S2" bpmnElement="DIA_S2">
-        <di:waypoint x="695" y="562" />
-        <di:waypoint x="658" y="535" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="E_MF6" bpmnElement="MF6">
-        <di:waypoint x="390" y="805" />
-        <di:waypoint x="390" y="680" />
-        <di:waypoint x="650" y="680" />
-        <di:waypoint x="650" y="540" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="405" y="686" width="89" height="27" />
+          <dc:Bounds x="788" y="386" width="83" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="E_MF5" bpmnElement="MF5">
-        <di:waypoint x="640" y="540" />
-        <di:waypoint x="640" y="670" />
-        <di:waypoint x="350" y="670" />
-        <di:waypoint x="350" y="805" />
+        <di:waypoint x="670" y="540" />
+        <di:waypoint x="670" y="795" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="368" y="655" width="83" height="27" />
+          <dc:Bounds x="578" y="736" width="83" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="E_MF8" bpmnElement="MF8">
-        <di:waypoint x="730" y="770" />
-        <di:waypoint x="730" y="700" />
-        <di:waypoint x="1030" y="700" />
-        <di:waypoint x="1030" y="540" />
+      <bpmndi:BPMNEdge id="E_MF6" bpmnElement="MF6">
+        <di:waypoint x="690" y="795" />
+        <di:waypoint x="690" y="530" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="836" y="675" width="89" height="27" />
+          <dc:Bounds x="697" y="677" width="85" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="E_MF7" bpmnElement="MF7">
         <di:waypoint x="1020" y="540" />
         <di:waypoint x="1020" y="690" />
-        <di:waypoint x="500" y="690" />
-        <di:waypoint x="500" y="827" />
+        <di:waypoint x="800" y="690" />
+        <di:waypoint x="800" y="817" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="717" y="665" width="87" height="27" />
+          <dc:Bounds x="871" y="656" width="87" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_MF8" bpmnElement="MF8">
+        <di:waypoint x="1030" y="760" />
+        <di:waypoint x="1030" y="540" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1035" y="656" width="89" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="E_DIA_A1" bpmnElement="DIA_A1">
-        <di:waypoint x="370" y="900" />
-        <di:waypoint x="370" y="885" />
+        <di:waypoint x="670" y="945" />
+        <di:waypoint x="670" y="875" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="E_DOA_A1" bpmnElement="DOA_A1">
-        <di:waypoint x="730" y="850" />
-        <di:waypoint x="730" y="925" />
-        <di:waypoint x="395" y="925" />
+        <di:waypoint x="1030" y="840" />
+        <di:waypoint x="1030" y="970" />
+        <di:waypoint x="695" y="970" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
