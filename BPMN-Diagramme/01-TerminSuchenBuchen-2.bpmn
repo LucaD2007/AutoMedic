@@ -14,39 +14,6 @@
     <bpmn:startEvent id="Start_Patient" name="Terminbedarf entsteht">
       <bpmn:outgoing>Flow_P1</bpmn:outgoing>
     </bpmn:startEvent>
-    <bpmn:task id="Task_P_PlattformAufrufen" name="Plattform aufrufen und anmelden">
-      <bpmn:incoming>Flow_P1</bpmn:incoming>
-      <bpmn:outgoing>Flow_P2</bpmn:outgoing>
-    </bpmn:task>
-    <bpmn:task id="Task_P_FachrichtungWaehlen" name="Fachrichtung / Arzt auswählen">
-      <bpmn:incoming>Flow_P2</bpmn:incoming>
-      <bpmn:outgoing>Flow_P3</bpmn:outgoing>
-    </bpmn:task>
-    <bpmn:task id="Task_P_TermineSuchen" name="Verfügbare Termine suchen">
-      <bpmn:incoming>Flow_P3</bpmn:incoming>
-      <bpmn:outgoing>Flow_P4</bpmn:outgoing>
-    </bpmn:task>
-    <bpmn:task id="Task_P_TerminAuswaehlen" name="Termin auswählen">
-      <bpmn:incoming>Flow_P4</bpmn:incoming>
-      <bpmn:outgoing>Flow_P5</bpmn:outgoing>
-    </bpmn:task>
-    <bpmn:task id="Task_P_NotizEingeben" name="Termingrund / Notiz eingeben">
-      <bpmn:incoming>Flow_P5</bpmn:incoming>
-      <bpmn:outgoing>Flow_P6</bpmn:outgoing>
-      <bpmn:property id="Property_P_Notiz" name="__targetRef_placeholder" />
-      <bpmn:dataInputAssociation id="DIA_P1">
-        <bpmn:sourceRef>DataObject_Notiz</bpmn:sourceRef>
-        <bpmn:targetRef>Property_P_Notiz</bpmn:targetRef>
-      </bpmn:dataInputAssociation>
-    </bpmn:task>
-    <bpmn:task id="Task_P_BuchungBestaetigen" name="Buchung bestätigen">
-      <bpmn:incoming>Flow_P6</bpmn:incoming>
-      <bpmn:outgoing>Flow_P7</bpmn:outgoing>
-    </bpmn:task>
-    <bpmn:task id="Task_P_BestaetigungErhalten" name="Buchungsbestätigung erhalten">
-      <bpmn:incoming>Flow_P7</bpmn:incoming>
-      <bpmn:outgoing>Flow_P8</bpmn:outgoing>
-    </bpmn:task>
     <bpmn:dataObjectReference id="DataObject_Notiz" name="Notiz (Was soll gemacht werden)" dataObjectRef="DO_Notiz" />
     <bpmn:dataObject id="DO_Notiz" />
     <bpmn:sequenceFlow id="Flow_P1" sourceRef="Start_Patient" targetRef="Task_P_PlattformAufrufen" />
@@ -60,45 +27,50 @@
     <bpmn:endEvent id="End_Patient" name="Termin gebucht">
       <bpmn:incoming>Flow_P8</bpmn:incoming>
     </bpmn:endEvent>
+    <bpmn:userTask id="Task_P_PlattformAufrufen" name="Plattform aufrufen und anmelden">
+      <bpmn:incoming>Flow_P1</bpmn:incoming>
+      <bpmn:outgoing>Flow_P2</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="Task_P_FachrichtungWaehlen" name="Fachrichtung / Arzt auswählen">
+      <bpmn:incoming>Flow_P2</bpmn:incoming>
+      <bpmn:outgoing>Flow_P3</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="Task_P_TermineSuchen" name="Verfügbare Termine suchen">
+      <bpmn:incoming>Flow_P3</bpmn:incoming>
+      <bpmn:outgoing>Flow_P4</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="Task_P_TerminAuswaehlen" name="Termin auswählen">
+      <bpmn:incoming>Flow_P4</bpmn:incoming>
+      <bpmn:outgoing>Flow_P5</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="Task_P_NotizEingeben" name="Termingrund / Notiz eingeben">
+      <bpmn:incoming>Flow_P5</bpmn:incoming>
+      <bpmn:outgoing>Flow_P6</bpmn:outgoing>
+      <bpmn:property id="Property_0szmgy5" name="__targetRef_placeholder" />
+      <bpmn:dataInputAssociation id="DIA_P1">
+        <bpmn:sourceRef>DataObject_Notiz</bpmn:sourceRef>
+        <bpmn:targetRef>Property_0szmgy5</bpmn:targetRef>
+      </bpmn:dataInputAssociation>
+    </bpmn:userTask>
+    <bpmn:sendTask id="Task_P_BuchungBestaetigen" name="Buchung bestätigen">
+      <bpmn:incoming>Flow_P6</bpmn:incoming>
+      <bpmn:outgoing>Flow_P7</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:receiveTask id="Task_P_BestaetigungErhalten" name="Buchungsbestätigung erhalten">
+      <bpmn:incoming>Flow_P7</bpmn:incoming>
+      <bpmn:outgoing>Flow_P8</bpmn:outgoing>
+    </bpmn:receiveTask>
   </bpmn:process>
   <bpmn:process id="Process_System" isExecutable="false">
     <bpmn:startEvent id="Start_System" name="Suchanfrage eingetroffen">
       <bpmn:outgoing>Flow_S1</bpmn:outgoing>
       <bpmn:messageEventDefinition id="MED_Start_S" />
     </bpmn:startEvent>
-    <bpmn:task id="Task_S_SuchanfrageEmpfangen" name="Suchanfrage verarbeiten">
-      <bpmn:incoming>Flow_S1</bpmn:incoming>
-      <bpmn:outgoing>Flow_S2</bpmn:outgoing>
-    </bpmn:task>
-    <bpmn:task id="Task_S_VerfuegbarkeitPruefen" name="Verfügbarkeit im Kalender pruefen">
-      <bpmn:incoming>Flow_S2</bpmn:incoming>
-      <bpmn:outgoing>Flow_S3</bpmn:outgoing>
-      <bpmn:property id="Property_S_Kalender" name="__targetRef_placeholder" />
-      <bpmn:dataInputAssociation id="DIA_S1">
-        <bpmn:sourceRef>DataStore_Terminkalender</bpmn:sourceRef>
-        <bpmn:targetRef>Property_S_Kalender</bpmn:targetRef>
-      </bpmn:dataInputAssociation>
-    </bpmn:task>
-    <bpmn:task id="Task_S_TermineAnzeigen" name="Verfügbare Termine anzeigen">
-      <bpmn:incoming>Flow_S3</bpmn:incoming>
-      <bpmn:outgoing>Flow_S4</bpmn:outgoing>
-    </bpmn:task>
-    <bpmn:task id="Task_S_BuchungEmpfangen" name="Buchungsanfrage empfangen">
-      <bpmn:incoming>Flow_S4</bpmn:incoming>
-      <bpmn:outgoing>Flow_S5</bpmn:outgoing>
-    </bpmn:task>
     <bpmn:exclusiveGateway id="GW_S_Verfuegbar" name="Termin noch verfügbar?">
       <bpmn:incoming>Flow_S5</bpmn:incoming>
       <bpmn:outgoing>Flow_S6_Ja</bpmn:outgoing>
       <bpmn:outgoing>Flow_S6_Nein</bpmn:outgoing>
     </bpmn:exclusiveGateway>
-    <bpmn:task id="Task_S_TerminReservieren" name="Termin im Kalender reservieren">
-      <bpmn:incoming>Flow_S6_Ja</bpmn:incoming>
-      <bpmn:outgoing>Flow_00gypyc</bpmn:outgoing>
-      <bpmn:dataOutputAssociation id="DOA_S1">
-        <bpmn:targetRef>DataStore_Terminkalender</bpmn:targetRef>
-      </bpmn:dataOutputAssociation>
-    </bpmn:task>
     <bpmn:endEvent id="End_System_Abbruch" name="Termin nicht mehr verfügbar">
       <bpmn:incoming>Flow_S6_Nein</bpmn:incoming>
     </bpmn:endEvent>
@@ -114,34 +86,54 @@
     <bpmn:sequenceFlow id="Flow_S12" sourceRef="Task_S_NotizSpeichern" targetRef="Task_S_BenachrichtigungPraxis" />
     <bpmn:sequenceFlow id="Flow_S13" sourceRef="Task_S_BenachrichtigungPraxis" targetRef="End_System" />
     <bpmn:sequenceFlow id="Flow_00gypyc" sourceRef="Task_S_TerminReservieren" targetRef="Task_S_NotizSpeichern" />
-    <bpmn:task id="Task_S_NotizSpeichern" name="Notiz zum Termin speichern">
+    <bpmn:endEvent id="End_System" name="Buchung abgeschlossen">
+      <bpmn:incoming>Flow_S13</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="Task_S_SuchanfrageEmpfangen" name="Suchanfrage verarbeiten">
+      <bpmn:incoming>Flow_S1</bpmn:incoming>
+      <bpmn:outgoing>Flow_S2</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Task_S_VerfuegbarkeitPruefen" name="Verfügbarkeit im Kalender pruefen">
+      <bpmn:incoming>Flow_S2</bpmn:incoming>
+      <bpmn:outgoing>Flow_S3</bpmn:outgoing>
+      <bpmn:property id="Property_1d1y5u3" name="__targetRef_placeholder" />
+      <bpmn:dataInputAssociation id="DIA_S1">
+        <bpmn:sourceRef>DataStore_Terminkalender</bpmn:sourceRef>
+        <bpmn:targetRef>Property_1d1y5u3</bpmn:targetRef>
+      </bpmn:dataInputAssociation>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Task_S_TermineAnzeigen" name="Verfügbare Termine anzeigen">
+      <bpmn:incoming>Flow_S3</bpmn:incoming>
+      <bpmn:outgoing>Flow_S4</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:receiveTask id="Task_S_BuchungEmpfangen" name="Buchungsanfrage empfangen">
+      <bpmn:incoming>Flow_S4</bpmn:incoming>
+      <bpmn:outgoing>Flow_S5</bpmn:outgoing>
+    </bpmn:receiveTask>
+    <bpmn:serviceTask id="Task_S_TerminReservieren" name="Termin im Kalender reservieren">
+      <bpmn:incoming>Flow_S6_Ja</bpmn:incoming>
+      <bpmn:outgoing>Flow_00gypyc</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DOA_S1">
+        <bpmn:targetRef>DataStore_Terminkalender</bpmn:targetRef>
+      </bpmn:dataOutputAssociation>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Task_S_NotizSpeichern" name="Notiz zum Termin speichern">
       <bpmn:incoming>Flow_00gypyc</bpmn:incoming>
       <bpmn:outgoing>Flow_S11</bpmn:outgoing>
       <bpmn:outgoing>Flow_S12</bpmn:outgoing>
       <bpmn:dataOutputAssociation id="DOA_S3">
         <bpmn:targetRef>DataStore_Terminkalender</bpmn:targetRef>
       </bpmn:dataOutputAssociation>
-    </bpmn:task>
-    <bpmn:task id="Task_S_BestaetigungPatient" name="Bestätigung an Patient senden">
+    </bpmn:serviceTask>
+    <bpmn:sendTask id="Task_S_BestaetigungPatient" name="Bestätigung an Patient senden">
       <bpmn:incoming>Flow_S11</bpmn:incoming>
-    </bpmn:task>
-    <bpmn:task id="Task_S_BenachrichtigungPraxis" name="Praxis über neuen Termin benachrichtigen">
+    </bpmn:sendTask>
+    <bpmn:sendTask id="Task_S_BenachrichtigungPraxis" name="Praxis über neuen Termin benachrichtigen">
       <bpmn:incoming>Flow_S12</bpmn:incoming>
       <bpmn:outgoing>Flow_S13</bpmn:outgoing>
-    </bpmn:task>
-    <bpmn:endEvent id="End_System" name="Buchung abgeschlossen">
-      <bpmn:incoming>Flow_S13</bpmn:incoming>
-    </bpmn:endEvent>
+    </bpmn:sendTask>
   </bpmn:process>
   <bpmn:process id="Process_Praxis" isExecutable="false">
-    <bpmn:task id="Task_Pr_KalenderEinsehen" name="Termin im Praxiskalender einsehen">
-      <bpmn:incoming>Flow_0nfj85d</bpmn:incoming>
-      <bpmn:outgoing>Flow_Pr3</bpmn:outgoing>
-    </bpmn:task>
-    <bpmn:task id="Task_Pr_VorbereitungPlanen" name="Vorbereitung für Termin planen">
-      <bpmn:incoming>Flow_Pr3</bpmn:incoming>
-      <bpmn:outgoing>Flow_Pr4</bpmn:outgoing>
-    </bpmn:task>
     <bpmn:endEvent id="End_Praxis" name="Termin vorbereitet">
       <bpmn:incoming>Flow_Pr4</bpmn:incoming>
     </bpmn:endEvent>
@@ -152,10 +144,6 @@
       <bpmn:outgoing>Flow_Pr1</bpmn:outgoing>
       <bpmn:messageEventDefinition id="MED_Start_Pr" />
     </bpmn:startEvent>
-    <bpmn:task id="Task_Pr_BenachrichtigungErhalten" name="Terminbenachrichtigung prüfen">
-      <bpmn:incoming>Flow_Pr1</bpmn:incoming>
-      <bpmn:outgoing>Flow_1mgnudt</bpmn:outgoing>
-    </bpmn:task>
     <bpmn:exclusiveGateway id="GW_S_Geraete" name="Geräte benötigt?">
       <bpmn:incoming>Flow_1mgnudt</bpmn:incoming>
       <bpmn:outgoing>Flow_1pmdbvu</bpmn:outgoing>
@@ -164,13 +152,6 @@
     <bpmn:sequenceFlow id="Flow_1mgnudt" sourceRef="Task_Pr_BenachrichtigungErhalten" targetRef="GW_S_Geraete" />
     <bpmn:sequenceFlow id="Flow_1pmdbvu" name="Ja" sourceRef="GW_S_Geraete" targetRef="Task_S_GeraeteReservieren" />
     <bpmn:dataStoreReference id="DataStore_Geraete" name="Geräteverwaltung" />
-    <bpmn:task id="Task_S_GeraeteReservieren" name="Geräte reservieren">
-      <bpmn:incoming>Flow_1pmdbvu</bpmn:incoming>
-      <bpmn:outgoing>Flow_0xojrkc</bpmn:outgoing>
-      <bpmn:dataOutputAssociation id="DOA_S2">
-        <bpmn:targetRef>DataStore_Geraete</bpmn:targetRef>
-      </bpmn:dataOutputAssociation>
-    </bpmn:task>
     <bpmn:sequenceFlow id="Flow_1416sm2" name="Nein" sourceRef="GW_S_Geraete" targetRef="GW_S_Merge" />
     <bpmn:sequenceFlow id="Flow_0xojrkc" sourceRef="Task_S_GeraeteReservieren" targetRef="GW_S_Merge" />
     <bpmn:exclusiveGateway id="GW_S_Merge" name="">
@@ -179,6 +160,25 @@
       <bpmn:outgoing>Flow_0nfj85d</bpmn:outgoing>
     </bpmn:exclusiveGateway>
     <bpmn:sequenceFlow id="Flow_0nfj85d" sourceRef="GW_S_Merge" targetRef="Task_Pr_KalenderEinsehen" />
+    <bpmn:receiveTask id="Task_Pr_BenachrichtigungErhalten" name="Terminbenachrichtigung prüfen">
+      <bpmn:incoming>Flow_Pr1</bpmn:incoming>
+      <bpmn:outgoing>Flow_1mgnudt</bpmn:outgoing>
+    </bpmn:receiveTask>
+    <bpmn:manualTask id="Task_S_GeraeteReservieren" name="Geräte reservieren">
+      <bpmn:incoming>Flow_1pmdbvu</bpmn:incoming>
+      <bpmn:outgoing>Flow_0xojrkc</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DOA_S2">
+        <bpmn:targetRef>DataStore_Geraete</bpmn:targetRef>
+      </bpmn:dataOutputAssociation>
+    </bpmn:manualTask>
+    <bpmn:manualTask id="Task_Pr_KalenderEinsehen" name="Termin im Praxiskalender einsehen">
+      <bpmn:incoming>Flow_0nfj85d</bpmn:incoming>
+      <bpmn:outgoing>Flow_Pr3</bpmn:outgoing>
+    </bpmn:manualTask>
+    <bpmn:manualTask id="Task_Pr_VorbereitungPlanen" name="Vorbereitung für Termin planen">
+      <bpmn:incoming>Flow_Pr3</bpmn:incoming>
+      <bpmn:outgoing>Flow_Pr4</bpmn:outgoing>
+    </bpmn:manualTask>
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_01">
@@ -192,32 +192,6 @@
           <dc:Bounds x="218" y="255" width="65" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Shape_P_PlattformAufrufen" bpmnElement="Task_P_PlattformAufrufen">
-        <dc:Bounds x="310" y="190" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Shape_P_FachrichtungWaehlen" bpmnElement="Task_P_FachrichtungWaehlen">
-        <dc:Bounds x="450" y="190" width="100" height="80" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Shape_P_TermineSuchen" bpmnElement="Task_P_TermineSuchen">
-        <dc:Bounds x="590" y="190" width="100" height="80" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Shape_P_TerminAuswaehlen" bpmnElement="Task_P_TerminAuswaehlen">
-        <dc:Bounds x="730" y="190" width="100" height="80" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Shape_P_NotizEingeben" bpmnElement="Task_P_NotizEingeben">
-        <dc:Bounds x="870" y="190" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Shape_P_BuchungBestaetigen" bpmnElement="Task_P_BuchungBestaetigen">
-        <dc:Bounds x="1040" y="190" width="100" height="80" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Shape_P_BestaetigungErhalten" bpmnElement="Task_P_BestaetigungErhalten">
-        <dc:Bounds x="1320" y="190" width="100" height="80" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Shape_DataObject_Notiz" bpmnElement="DataObject_Notiz">
         <dc:Bounds x="892" y="105" width="36" height="50" />
         <bpmndi:BPMNLabel>
@@ -229,6 +203,27 @@
         <bpmndi:BPMNLabel>
           <dc:Bounds x="1592" y="255" width="76" height="14" />
         </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1jpeyh0_di" bpmnElement="Task_P_PlattformAufrufen">
+        <dc:Bounds x="310" y="190" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0c9j0bt_di" bpmnElement="Task_P_FachrichtungWaehlen">
+        <dc:Bounds x="450" y="190" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_02uv50e_di" bpmnElement="Task_P_TermineSuchen">
+        <dc:Bounds x="590" y="190" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0hujmyr_di" bpmnElement="Task_P_TerminAuswaehlen">
+        <dc:Bounds x="730" y="190" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_17ocypp_di" bpmnElement="Task_P_NotizEingeben">
+        <dc:Bounds x="870" y="190" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_00zfsyb_di" bpmnElement="Task_P_BuchungBestaetigen">
+        <dc:Bounds x="1040" y="190" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0r6lpdf_di" bpmnElement="Task_P_BestaetigungErhalten">
+        <dc:Bounds x="1320" y="190" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Edge_P1" bpmnElement="Flow_P1">
         <di:waypoint x="268" y="230" />
@@ -272,28 +267,11 @@
           <dc:Bounds x="219" y="595" width="63" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Shape_S_SuchanfrageEmpfangen" bpmnElement="Task_S_SuchanfrageEmpfangen">
-        <dc:Bounds x="310" y="530" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Shape_S_VerfuegbarkeitPruefen" bpmnElement="Task_S_VerfuegbarkeitPruefen">
-        <dc:Bounds x="450" y="530" width="100" height="80" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Shape_S_TermineAnzeigen" bpmnElement="Task_S_TermineAnzeigen">
-        <dc:Bounds x="590" y="530" width="100" height="80" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Shape_S_BuchungEmpfangen" bpmnElement="Task_S_BuchungEmpfangen">
-        <dc:Bounds x="730" y="530" width="100" height="80" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Shape_GW_Verfuegbar" bpmnElement="GW_S_Verfuegbar" isMarkerVisible="true">
         <dc:Bounds x="865" y="545" width="50" height="50" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="860" y="516" width="60" height="27" />
         </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Shape_S_TerminReservieren" bpmnElement="Task_S_TerminReservieren">
-        <dc:Bounds x="950" y="530" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Shape_End_System_Abbruch" bpmnElement="End_System_Abbruch">
         <dc:Bounds x="872" y="672" width="36" height="36" />
@@ -307,22 +285,35 @@
           <dc:Bounds x="462" y="792" width="76" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Shape_S_NotizSpeichern" bpmnElement="Task_S_NotizSpeichern">
-        <dc:Bounds x="1120" y="530" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Shape_S_BestaetigungPatient" bpmnElement="Task_S_BestaetigungPatient">
-        <dc:Bounds x="1330" y="470" width="100" height="80" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Shape_S_BenachrichtigungPraxis" bpmnElement="Task_S_BenachrichtigungPraxis">
-        <dc:Bounds x="1330" y="590" width="100" height="80" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Shape_End_System" bpmnElement="End_System">
         <dc:Bounds x="1622" y="612" width="36" height="36" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="1603" y="655" width="74" height="27" />
         </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0gxi7yo_di" bpmnElement="Task_S_SuchanfrageEmpfangen">
+        <dc:Bounds x="310" y="530" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_19zdl87_di" bpmnElement="Task_S_VerfuegbarkeitPruefen">
+        <dc:Bounds x="450" y="530" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1mkuw8p_di" bpmnElement="Task_S_TermineAnzeigen">
+        <dc:Bounds x="590" y="530" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0d45vw9_di" bpmnElement="Task_S_BuchungEmpfangen">
+        <dc:Bounds x="730" y="530" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0nuuyun_di" bpmnElement="Task_S_TerminReservieren">
+        <dc:Bounds x="950" y="530" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1btruu6_di" bpmnElement="Task_S_NotizSpeichern">
+        <dc:Bounds x="1120" y="530" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1bq30i3_di" bpmnElement="Task_S_BestaetigungPatient">
+        <dc:Bounds x="1330" y="470" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0u20vl0_di" bpmnElement="Task_S_BenachrichtigungPraxis">
+        <dc:Bounds x="1330" y="590" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Edge_S1" bpmnElement="Flow_S1">
         <di:waypoint x="268" y="570" />
@@ -380,13 +371,6 @@
         <dc:Bounds x="160" y="850" width="1540" height="250" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Shape_Pr_KalenderEinsehen" bpmnElement="Task_Pr_KalenderEinsehen">
-        <dc:Bounds x="1310" y="910" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Shape_Pr_Vorbereitung" bpmnElement="Task_Pr_VorbereitungPlanen">
-        <dc:Bounds x="1480" y="910" width="100" height="80" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Shape_End_Praxis" bpmnElement="End_Praxis">
         <dc:Bounds x="1622" y="932" width="36" height="36" />
         <bpmndi:BPMNLabel>
@@ -398,10 +382,6 @@
         <bpmndi:BPMNLabel>
           <dc:Bounds x="467" y="975" width="86" height="27" />
         </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Shape_Pr_Benachrichtigung" bpmnElement="Task_Pr_BenachrichtigungErhalten">
-        <dc:Bounds x="710" y="910" width="100" height="80" />
-        <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Shape_GW_Geraete" bpmnElement="GW_S_Geraete" isMarkerVisible="true">
         <dc:Bounds x="895" y="925" width="50" height="50" />
@@ -415,12 +395,20 @@
           <dc:Bounds x="1106" y="849" width="87" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Shape_S_GeraeteReservieren" bpmnElement="Task_S_GeraeteReservieren">
-        <dc:Bounds x="990" y="910" width="100" height="80" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Shape_GW_Merge" bpmnElement="GW_S_Merge" isMarkerVisible="true">
         <dc:Bounds x="1155" y="925" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_13l05gp_di" bpmnElement="Task_Pr_BenachrichtigungErhalten">
+        <dc:Bounds x="710" y="910" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0yukq5x_di" bpmnElement="Task_S_GeraeteReservieren">
+        <dc:Bounds x="990" y="910" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_17bc60n_di" bpmnElement="Task_Pr_KalenderEinsehen">
+        <dc:Bounds x="1310" y="910" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_01xouzz_di" bpmnElement="Task_Pr_VorbereitungPlanen">
+        <dc:Bounds x="1480" y="910" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Edge_Pr1" bpmnElement="Flow_Pr1">
         <di:waypoint x="528" y="950" />
@@ -475,14 +463,14 @@
         <di:waypoint x="1000" y="760" />
         <di:waypoint x="525" y="760" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Edge_DOA_S2" bpmnElement="DOA_S2">
-        <di:waypoint x="1089" y="915" />
-        <di:waypoint x="1125" y="900" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Edge_DOA_S3" bpmnElement="DOA_S3">
         <di:waypoint x="1170" y="610" />
         <di:waypoint x="1170" y="760" />
         <di:waypoint x="525" y="760" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_DOA_S2" bpmnElement="DOA_S2">
+        <di:waypoint x="1089" y="915" />
+        <di:waypoint x="1125" y="900" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Edge_MF01" bpmnElement="MF_01">
         <di:waypoint x="610" y="270" />
@@ -499,7 +487,7 @@
         <di:waypoint x="780" y="400" />
         <di:waypoint x="780" y="270" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="669" y="375" width="62" height="27" />
+          <dc:Bounds x="673" y="375" width="54" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Edge_MF03" bpmnElement="MF_03">
@@ -508,7 +496,7 @@
         <di:waypoint x="820" y="400" />
         <di:waypoint x="820" y="530" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="897" y="382" width="187" height="14" />
+          <dc:Bounds x="924" y="382" width="133" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Edge_MF04" bpmnElement="MF_04">
