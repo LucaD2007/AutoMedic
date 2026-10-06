@@ -1,0 +1,107 @@
+<mxfile host="app.diagrams.net" agent="EKX DeepAgent" version="24.0.0">
+  <diagram id="UseCase_Terminbuchung" name="Use-Case-Diagramm">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="826" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- System boundary -->
+        <mxCell id="boundary" value="Digitale Terminbuchungsplattform" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;fontStyle=1;fontSize=14;align=center;spacingTop=8;" vertex="1" parent="1">
+          <mxGeometry x="300" y="60" width="500" height="620" as="geometry" />
+        </mxCell>
+
+        <!-- Actors -->
+        <mxCell id="actor_patient" value="Patient" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="100" y="330" width="40" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="actor_arzt" value="Arzt / Hausarzt" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="960" y="110" width="40" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="actor_facharzt" value="Facharzt" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="960" y="250" width="40" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="actor_praxis" value="Praxismitarbeiter" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="960" y="410" width="40" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="actor_apo" value="Apotheke" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="960" y="560" width="40" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Use cases: left column -->
+        <mxCell id="uc1" value="Registrieren" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="330" y="100" width="170" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="uc2" value="Termin suchen &amp; buchen" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="330" y="180" width="170" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="uc3" value="Termin absagen" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="330" y="260" width="170" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="uc4" value="Termin verschieben" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="330" y="340" width="170" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="uc5" value="Terminerinnerung erhalten" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="330" y="420" width="170" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="uc6" value="Check-in durchfuehren" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="330" y="500" width="170" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Use cases: right column -->
+        <mxCell id="uc7" value="Notfall melden" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="600" y="100" width="170" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="uc8" value="Patient ueberweisen" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="600" y="180" width="170" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="uc9" value="Apotheke suchen" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="600" y="260" width="170" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="uc10" value="Folgerezept anfordern" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="600" y="340" width="170" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="uc11" value="Videosprechstunde buchen" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="600" y="420" width="170" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="uc12" value="Post-Termin nachbereiten" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="600" y="500" width="170" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Associations: Patient -->
+        <mxCell id="e_p1" style="endArrow=none;html=1;" edge="1" parent="1" source="actor_patient" target="uc1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e_p2" style="endArrow=none;html=1;" edge="1" parent="1" source="actor_patient" target="uc2"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e_p3" style="endArrow=none;html=1;" edge="1" parent="1" source="actor_patient" target="uc3"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e_p4" style="endArrow=none;html=1;" edge="1" parent="1" source="actor_patient" target="uc4"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e_p5" style="endArrow=none;html=1;" edge="1" parent="1" source="actor_patient" target="uc5"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e_p6" style="endArrow=none;html=1;" edge="1" parent="1" source="actor_patient" target="uc6"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e_p7" style="endArrow=none;html=1;" edge="1" parent="1" source="actor_patient" target="uc7"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e_p9" style="endArrow=none;html=1;" edge="1" parent="1" source="actor_patient" target="uc9"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e_p10" style="endArrow=none;html=1;" edge="1" parent="1" source="actor_patient" target="uc10"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e_p11" style="endArrow=none;html=1;" edge="1" parent="1" source="actor_patient" target="uc11"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- Associations: Arzt/Hausarzt -->
+        <mxCell id="e_a8" style="endArrow=none;html=1;" edge="1" parent="1" source="actor_arzt" target="uc8"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e_a10" style="endArrow=none;html=1;" edge="1" parent="1" source="actor_arzt" target="uc10"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e_a11" style="endArrow=none;html=1;" edge="1" parent="1" source="actor_arzt" target="uc11"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e_a12" style="endArrow=none;html=1;" edge="1" parent="1" source="actor_arzt" target="uc12"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- Associations: Facharzt -->
+        <mxCell id="e_f8" style="endArrow=none;html=1;" edge="1" parent="1" source="actor_facharzt" target="uc8"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- Associations: Praxismitarbeiter -->
+        <mxCell id="e_pr1" style="endArrow=none;html=1;" edge="1" parent="1" source="actor_praxis" target="uc1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e_pr5" style="endArrow=none;html=1;" edge="1" parent="1" source="actor_praxis" target="uc5"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e_pr6" style="endArrow=none;html=1;" edge="1" parent="1" source="actor_praxis" target="uc6"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- Associations: Apotheke -->
+        <mxCell id="e_ap9" style="endArrow=none;html=1;" edge="1" parent="1" source="actor_apo" target="uc9"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e_ap10" style="endArrow=none;html=1;" edge="1" parent="1" source="actor_apo" target="uc10"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- include / extend -->
+        <mxCell id="e_inc" value="&lt;&lt;include&gt;&gt;" style="endArrow=open;dashed=1;html=1;fontSize=10;" edge="1" parent="1" source="uc4" target="uc2"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e_ext" value="&lt;&lt;extend&gt;&gt;" style="endArrow=open;dashed=1;html=1;fontSize=10;" edge="1" parent="1" source="uc11" target="uc2"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
