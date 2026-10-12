@@ -182,10 +182,12 @@ Beziehungen:
 
 ### Klassendiagramm (erledigt)
 - Datei: `Klassendiagramm.drawio` (draw.io; fuer Abgabe in Visual Paradigm nachbauen)
-- **15 Klassen** (Anforderung >=10 erfuellt), aus BPMN-Datenobjekten/-speichern und Akteuren abgeleitet
-- Klassen: Person (abstrakt), Patient, Arzt, Facharzt, Arztpraxis, Terminkalender, Termin, Ueberweisung, Patientenakte, Rezept, Medikament, Apotheke, Benachrichtigung, Videositzung, Notfallprotokoll
-- Jede Klasse mit Attributen und (wo sinnvoll) Methoden
-- Beziehungen: Vererbung (Patient/Arzt → Person, Facharzt → Arzt), 14 Assoziationen mit Multiplizitaeten (z.B. Patient 1 -- * Termin, Arztpraxis 1 -- 1 Terminkalender, Rezept * -- 1 Medikament)
+- **18 Klassen** (Anforderung >=10 erfuellt), konsistent zu den 5 Sequenzdiagrammen
+- Fachklassen: Person (abstrakt), Patient, Arzt, Facharzt, Arztpraxis, Terminkalender, Termin, Ueberweisung, Patientenakte, Rezept, Medikament, Apotheke, Benachrichtigung, Videositzung, Notfallprotokoll
+- Steuerungsklasse: Terminbuchungsplattform (zentraler Controller mit den Operationen aus den Sequenzdiagrammen)
+- Repository-Klassen: Patientendatenbank, Apothekendatenbank
+- Methoden ergaenzt fuer Konsistenz: Patientenakte.anlegen()/aktualisieren(); Arztpraxis.benachrichtigen()/freigabeAnfordern()/datenPruefen(); Arzt.patientenakteAnlegen()/terminBestaetigen(); Ueberweisung.mitTerminVerknuepfen()
+- Beziehungen: Vererbung (Patient/Arzt → Person, Facharzt → Arzt) + 20 Assoziationen mit Multiplizitaeten
 
 ### Noch offen (UML)
 - 5 Sequenzdiagramme (je als Unterdiagramm des zugehoerigen Use Case). Ausgewaehlt nach Akteur-Vielfalt, UML-Fragmenten und Klassenabdeckung:
@@ -322,3 +324,4 @@ Beziehungen:
 | 12.10.2026 | SD 09 (Post-Termin, von Gruppe ueberarbeitete Version 03-PostTermin.drawio) syntaxkonform korrigiert (Nummerierung, Aktivierungsbalken, unterstrichene Objekte, = wert); alte Dublette Sequenzdiagramm-09 entfernt |
 | 12.10.2026 | SD 08 (Apotheke suchen) syntaxkonform ueberarbeitet (Nummerierung, Aktivierungsbalken, unterstrichene Objekte, = wert-Rueckgaben) |
 | 12.10.2026 | SD 10 (Patientenregistrierung, von Gruppe ueberarbeitete Version 05-Patientenregistrierung.drawio) syntaxkonform korrigiert; alte Dublette entfernt. Alle 5 Sequenzdiagramme jetzt syntaxkonform |
+| 12.10.2026 | Konsistenzpruefung SD<->Klassendiagramm: Steuerungsklasse Terminbuchungsplattform + Repositorys (Patientendatenbank, Apothekendatenbank) ergaenzt, fehlende Methoden hinzugefuegt (Patientenakte, Arztpraxis, Arzt, Ueberweisung); Klassendiagramm jetzt 18 Klassen; :Hausarzt -> hausarzt:Arzt in SD05 |
