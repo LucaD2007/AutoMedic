@@ -188,7 +188,13 @@ Beziehungen:
 - Beziehungen: Vererbung (Patient/Arzt → Person, Facharzt → Arzt), 14 Assoziationen mit Multiplizitaeten (z.B. Patient 1 -- * Termin, Arztpraxis 1 -- 1 Terminkalender, Rezept * -- 1 Medikament)
 
 ### Noch offen (UML)
-- 5 Sequenzdiagramme (je als Unterdiagramm eines Use Case: Empfehlung Termin buchen, Termin absagen, Patient ueberweisen, Folgerezept, Videosprechstunde)
+- 5 Sequenzdiagramme (je als Unterdiagramm des zugehoerigen Use Case). Ausgewaehlt nach Akteur-Vielfalt, UML-Fragmenten und Klassenabdeckung:
+  1. Termin suchen & buchen (01) -- ERLEDIGT (Sequenzdiagramm-01-TerminBuchen.drawio); Patient/System/Terminkalender/Termin/Arztpraxis; alt-Fragment (Slot frei/vergeben)
+  2. Patient ueberweisen (05) -- komplexeste Interaktion; Hausarzt/System/Patient/Facharzt; Multi-Teilnehmer
+  3. Post-Termin / Behandlung & Rezept (09) -- Arzt/System/Patient; alt-Fragment, rezeptAusstellen()/freigeben()
+  4. Apotheke suchen (08) -- externer Akteur Apotheke; opt-Fragment; verfuegbarkeitPruefen()/reservieren()
+  5. Patientenregistrierung (10) -- Journey-Einstieg; Patient/System/Arztpraxis; alt/loop (Datenpruefung)
+  - Ersatzkandidaten: Notfallpatient (07), Videosprechstunde (12)
 - Finale Abgabe als VPP-Datei aus Visual Paradigm
 ---
 
@@ -201,11 +207,11 @@ Beziehungen:
 | BPMN-Kollaborationsdiagramme   | 10     | 10       | 0     |
 | Use-Case-Diagramm              | 1      | 1        | 0     |
 | Klassendiagramm                | 1      | 1        | 0     |
-| Sequenzdiagramme               | 5      | 0        | 5     |
+| Sequenzdiagramme               | 5      | 1        | 4     |
 | Projektdokumentation (20 S.)   | 1      | 0        | 1     |
 | Abschlusspraesentation         | 1      | 0        | 1     |
 | Abgabe-ZIP                     | 1      | 0        | 1     |
-| **Gesamt**                     | **20** | **12**   | **8** |
+| **Gesamt**                     | **20** | **13**   | **7** |
 
 > Zusaetzlich liegen 2 Reserve-Diagramme (11, 12) final vor.
 
@@ -304,3 +310,4 @@ Beziehungen:
 | 12.10.2026 | Use-Case-Diagramm an UML-Syntaxregeln (Betreuer-Blatt) angepasst: nummerierte Ablaufpfeile entfernt (Use-Case zeigt KEINEN Kontrollfluss/Reihenfolge); nur Mitwirkung, «include», «extend», Vererbung; Systemgrenze; 12 Use Cases |
 | 12.10.2026 | KI.md aktualisiert: neuer Abschnitt UML-Modellierung inkl. Use-Case-Syntaxregeln; Stand-Datum auf 12.10.2026 |
 | 12.10.2026 | Klassendiagramm in draw.io erstellt (15 Klassen, Vererbung + 14 Assoziationen mit Multiplizitaeten) -- Klassendiagramm.drawio |
+| 12.10.2026 | Sequenzdiagramm 1/5 erstellt: Termin suchen & buchen (5 Lifelines, 14 Nachrichten, alt-Fragment) -- Sequenzdiagramm-01-TerminBuchen.drawio |
