@@ -193,7 +193,7 @@ Beziehungen:
   2. Patient ueberweisen (05) -- ERLEDIGT (Sequenzdiagramm-05-PatientUeberweisen.drawio); 6 Lifelines (Hausarzt/System/Ueberweisung/Terminkalender/Patient/Facharzt); par-Fragment; mit Nachrichten-Nummerierung, Aktivierungsbalken, unterstrichenen Objektnamen, = wert-Rueckgaben (syntaxkonform)
   3. Post-Termin / Behandlung & Rezept (09) -- ERLEDIGT (03-PostTermin.drawio); Arzt/System/Patientenakte/Rezept/Patient; alt-Fragment (Rezept) + 2 opt-Fragmente (Folgetermin, Feedback); mit Nachrichten-Nummerierung, Aktivierungsbalken, unterstrichenen Objektnamen, = wert-Rueckgaben (syntaxkonform)
   4. Apotheke suchen (08) -- ERLEDIGT (Sequenzdiagramm-08-ApothekeSuchen.drawio); Patient/System/Apothekendatenbank/Apotheke; alt-Fragment (gefunden/keine) + opt-Fragment (Reservierung); mit Nachrichten-Nummerierung, Aktivierungsbalken, unterstrichenen Objektnamen, = wert-Rueckgaben (syntaxkonform)
-  5. Patientenregistrierung (10) -- ERLEDIGT (Sequenzdiagramm-10-Patientenregistrierung.drawio); Patient/System/Patientendatenbank/Arztpraxis; loop-Fragment (erneute Dateneingabe) + alt-Fragment (Freigabe/Ablehnung), Selbstaufruf datenPruefen()
+  5. Patientenregistrierung (10) -- ERLEDIGT (05-Patientenregistrierung.drawio); Patient/System/Patientendatenbank/Arztpraxis; loop-Fragment (erneute Dateneingabe) + alt-Fragment (Freigabe/Ablehnung), Selbstaufruf datenPruefen(); mit Nachrichten-Nummerierung, Aktivierungsbalken, unterstrichenen Objektnamen, = wert-Rueckgaben (syntaxkonform)
   - Alle 5 Sequenzdiagramme erledigt.
   - Ersatzkandidaten (nicht umgesetzt): Notfallpatient (07), Videosprechstunde (12)
 - Finale Abgabe als VPP-Datei aus Visual Paradigm (alle UML-Diagramme liegen als draw.io-Entwuerfe vor und sind in Visual Paradigm nachzubauen)
@@ -321,3 +321,4 @@ Beziehungen:
 | 12.10.2026 | SD 05 (Patient ueberweisen) syntaxkonform ueberarbeitet (Nummerierung, Aktivierungsbalken, unterstrichene Objekte, = wert-Rueckgaben) |
 | 12.10.2026 | SD 09 (Post-Termin, von Gruppe ueberarbeitete Version 03-PostTermin.drawio) syntaxkonform korrigiert (Nummerierung, Aktivierungsbalken, unterstrichene Objekte, = wert); alte Dublette Sequenzdiagramm-09 entfernt |
 | 12.10.2026 | SD 08 (Apotheke suchen) syntaxkonform ueberarbeitet (Nummerierung, Aktivierungsbalken, unterstrichene Objekte, = wert-Rueckgaben) |
+| 12.10.2026 | SD 10 (Patientenregistrierung, von Gruppe ueberarbeitete Version 05-Patientenregistrierung.drawio) syntaxkonform korrigiert; alte Dublette entfernt. Alle 5 Sequenzdiagramme jetzt syntaxkonform |
