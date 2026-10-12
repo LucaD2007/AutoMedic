@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_08" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.46.1">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_08" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.50.1">
   <bpmn:collaboration id="Collab_08">
     <bpmn:participant id="Pool_Patient" name="Patient" processRef="Proc_Patient" />
     <bpmn:participant id="Pool_System" name="Gesundheitsplattform" processRef="Proc_System" />
@@ -8,7 +8,7 @@
     <bpmn:messageFlow id="MF2" name="Ergebnisliste" sourceRef="T_S2" targetRef="T_P2" />
     <bpmn:messageFlow id="MF3" name="Apothekenwahl" sourceRef="T_P2" targetRef="T_S3" />
     <bpmn:messageFlow id="MF4" name="Detailinformationen" sourceRef="T_S3" targetRef="T_P3" />
-    <bpmn:messageFlow id="MF5" name="Verfuegbarkeitsanfrage" sourceRef="T_S2" targetRef="T_A1" />
+    <bpmn:messageFlow id="MF5" name="Verfügbarkeitsanfrage" sourceRef="T_S2" targetRef="T_A1" />
     <bpmn:messageFlow id="MF6" name="Bestandsrückmeldung" sourceRef="T_A1" targetRef="T_S2" />
     <bpmn:messageFlow id="MF7" name="Reservierungsanfrage" sourceRef="T_S4" targetRef="ICE_A1" />
     <bpmn:messageFlow id="MF8" name="Reservierungsbestätigung" sourceRef="T_A2" targetRef="T_S4" />
@@ -472,6 +472,15 @@
         <di:waypoint x="725" y="562" />
         <di:waypoint x="688" y="535" />
       </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_DIA_A1" bpmnElement="DIA_A1">
+        <di:waypoint x="670" y="945" />
+        <di:waypoint x="670" y="875" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E_DOA_A1" bpmnElement="DOA_A1">
+        <di:waypoint x="1030" y="840" />
+        <di:waypoint x="1030" y="970" />
+        <di:waypoint x="695" y="970" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="E_MF1" bpmnElement="MF1">
         <di:waypoint x="370" y="230" />
         <di:waypoint x="370" y="330" />
@@ -512,7 +521,7 @@
         <di:waypoint x="670" y="540" />
         <di:waypoint x="670" y="795" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="578" y="736" width="83" height="27" />
+          <dc:Bounds x="577" y="736" width="86" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="E_MF6" bpmnElement="MF6">
@@ -537,15 +546,6 @@
         <bpmndi:BPMNLabel>
           <dc:Bounds x="1035" y="656" width="89" height="27" />
         </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="E_DIA_A1" bpmnElement="DIA_A1">
-        <di:waypoint x="670" y="945" />
-        <di:waypoint x="670" y="875" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="E_DOA_A1" bpmnElement="DOA_A1">
-        <di:waypoint x="1030" y="840" />
-        <di:waypoint x="1030" y="970" />
-        <di:waypoint x="695" y="970" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
