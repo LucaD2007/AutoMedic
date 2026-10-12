@@ -191,7 +191,7 @@ Beziehungen:
 - 5 Sequenzdiagramme (je als Unterdiagramm des zugehoerigen Use Case). Ausgewaehlt nach Akteur-Vielfalt, UML-Fragmenten und Klassenabdeckung:
   1. Termin suchen & buchen (01) -- ERLEDIGT (Sequenzdiagramm-01-TerminBuchen.drawio); Patient/System/Terminkalender/Termin/Arztpraxis; alt-Fragment (Slot frei/vergeben); mit Nachrichten-Nummerierung, Aktivierungsbalken, unterstrichenen Objektnamen, = wert-Rueckgaben (syntaxkonform)
   2. Patient ueberweisen (05) -- ERLEDIGT (Sequenzdiagramm-05-PatientUeberweisen.drawio); 6 Lifelines (Hausarzt/System/Ueberweisung/Terminkalender/Patient/Facharzt); par-Fragment; mit Nachrichten-Nummerierung, Aktivierungsbalken, unterstrichenen Objektnamen, = wert-Rueckgaben (syntaxkonform)
-  3. Post-Termin / Behandlung & Rezept (09) -- ERLEDIGT (Sequenzdiagramm-09-PostTermin.drawio); Arzt/System/Patientenakte/Rezept/Patient; alt-Fragment (Rezept) + 2 opt-Fragmente (Folgetermin, Feedback), rezeptAusstellen()/freigeben()
+  3. Post-Termin / Behandlung & Rezept (09) -- ERLEDIGT (03-PostTermin.drawio); Arzt/System/Patientenakte/Rezept/Patient; alt-Fragment (Rezept) + 2 opt-Fragmente (Folgetermin, Feedback); mit Nachrichten-Nummerierung, Aktivierungsbalken, unterstrichenen Objektnamen, = wert-Rueckgaben (syntaxkonform)
   4. Apotheke suchen (08) -- ERLEDIGT (Sequenzdiagramm-08-ApothekeSuchen.drawio); Patient/System/Apothekendatenbank/Apotheke; alt-Fragment (gefunden/keine) + opt-Fragment (Reservierung), verfuegbarkeitPruefen()/reservieren()
   5. Patientenregistrierung (10) -- ERLEDIGT (Sequenzdiagramm-10-Patientenregistrierung.drawio); Patient/System/Patientendatenbank/Arztpraxis; loop-Fragment (erneute Dateneingabe) + alt-Fragment (Freigabe/Ablehnung), Selbstaufruf datenPruefen()
   - Alle 5 Sequenzdiagramme erledigt.
@@ -319,3 +319,4 @@ Beziehungen:
 | 12.10.2026 | Sequenzdiagramm 5/5 erstellt: Patientenregistrierung (4 Lifelines, loop-Fragment + alt-Fragment, Selbstaufruf datenPruefen) -- Sequenzdiagramm-10-Patientenregistrierung.drawio. UML-Modellierung vollstaendig (Use-Case, Klassendiagramm, 5 Sequenzdiagramme) |
 | 12.10.2026 | Sequenzdiagramm-Syntaxregeln (Betreuer-Blatt) analysiert: Nummerierung + Aktivierungsbalken fehlten. SD 01 ueberarbeitet (hierarchische Nummerierung, Aktivierungsbalken, unterstrichene Objekte, = wert-Rueckgaben) |
 | 12.10.2026 | SD 05 (Patient ueberweisen) syntaxkonform ueberarbeitet (Nummerierung, Aktivierungsbalken, unterstrichene Objekte, = wert-Rueckgaben) |
+| 12.10.2026 | SD 09 (Post-Termin, von Gruppe ueberarbeitete Version 03-PostTermin.drawio) syntaxkonform korrigiert (Nummerierung, Aktivierungsbalken, unterstrichene Objekte, = wert); alte Dublette Sequenzdiagramm-09 entfernt |
