@@ -191,7 +191,7 @@ Beziehungen:
 - 5 Sequenzdiagramme (je als Unterdiagramm des zugehoerigen Use Case). Ausgewaehlt nach Akteur-Vielfalt, UML-Fragmenten und Klassenabdeckung:
   1. Termin suchen & buchen (01) -- ERLEDIGT (Sequenzdiagramm-01-TerminBuchen.drawio); Patient/System/Terminkalender/Termin/Arztpraxis; alt-Fragment (Slot frei/vergeben)
   2. Patient ueberweisen (05) -- ERLEDIGT (Sequenzdiagramm-05-PatientUeberweisen.drawio); 6 Lifelines (Hausarzt/System/Ueberweisung/Terminkalender/Patient/Facharzt); par-Fragment fuer parallele Benachrichtigung
-  3. Post-Termin / Behandlung & Rezept (09) -- Arzt/System/Patient; alt-Fragment, rezeptAusstellen()/freigeben()
+  3. Post-Termin / Behandlung & Rezept (09) -- ERLEDIGT (Sequenzdiagramm-09-PostTermin.drawio); Arzt/System/Patientenakte/Rezept/Patient; alt-Fragment (Rezept) + 2 opt-Fragmente (Folgetermin, Feedback), rezeptAusstellen()/freigeben()
   4. Apotheke suchen (08) -- externer Akteur Apotheke; opt-Fragment; verfuegbarkeitPruefen()/reservieren()
   5. Patientenregistrierung (10) -- Journey-Einstieg; Patient/System/Arztpraxis; alt/loop (Datenpruefung)
   - Ersatzkandidaten: Notfallpatient (07), Videosprechstunde (12)
@@ -207,11 +207,11 @@ Beziehungen:
 | BPMN-Kollaborationsdiagramme   | 10     | 10       | 0     |
 | Use-Case-Diagramm              | 1      | 1        | 0     |
 | Klassendiagramm                | 1      | 1        | 0     |
-| Sequenzdiagramme               | 5      | 2        | 3     |
+| Sequenzdiagramme               | 5      | 3        | 2     |
 | Projektdokumentation (20 S.)   | 1      | 0        | 1     |
 | Abschlusspraesentation         | 1      | 0        | 1     |
 | Abgabe-ZIP                     | 1      | 0        | 1     |
-| **Gesamt**                     | **20** | **14**   | **6** |
+| **Gesamt**                     | **20** | **15**   | **5** |
 
 > Zusaetzlich liegen 2 Reserve-Diagramme (11, 12) final vor.
 
@@ -278,8 +278,7 @@ Beziehungen:
 | Prio | Aufgabe | Zustaendig | Hinweis |
 |------|---------|-----------|---------|
 | 1 | Abschlusspraesentation vorbereiten + proben | alle | Termin Mitte Oktober, individuelle Bewertung |
-| 2 | Restliche 3 Sequenzdiagramme (09 Post-Termin, 08 Apotheke suchen, 10 Patientenregistrierung) als UC-Unterdiagramme | Thilo | 2 von 5 erledigt (01, 05) |
-| 3 | UML-Diagramme in Visual Paradigm nachbauen und als VPP exportieren | Thilo, Helen | draw.io-Entwuerfe liegen vor |
+| 2 | Restliche 2 Sequenzdiagramme (08 Apotheke suchen, 10 Patientenregistrierung) als UC-Unterdiagramme | Thilo | 3 von 5 erledigt (01, 05, 09) || 3 | UML-Diagramme in Visual Paradigm nachbauen und als VPP exportieren | Thilo, Helen | draw.io-Entwuerfe liegen vor |
 | 4 | BPMN-Dateinamen vereinheitlichen + Pool-Benennung 08 angleichen + Camunda-Ablage/Export | Lennart | schnell, blockt Abgabe |
 | 5 | Projektdokumentation (~20 S.) finalisieren | Luca | Material groesstenteils in KI.md vorhanden |
 | 6 | Abgabe-ZIP buendeln + Moodle-Upload | alle | Deadline 13.11., 23:59 |
@@ -314,3 +313,4 @@ Beziehungen:
 | 12.10.2026 | Sequenzdiagramm 1/5 erstellt: Termin suchen & buchen (5 Lifelines, 14 Nachrichten, alt-Fragment) -- Sequenzdiagramm-01-TerminBuchen.drawio |
 | 12.10.2026 | Sequenzdiagramm 2/5 erstellt: Patient ueberweisen (6 Lifelines, par-Fragment, Selbstaufruf patientenakteAnlegen) -- Sequenzdiagramm-05-PatientUeberweisen.drawio |
 | 12.10.2026 | Fehlenden Download-Link zu Sequenzdiagramm 2 nachgereicht; Naechste-Schritte-Tabelle aktualisiert (Use-Case/Klassendiagramm erledigt, Sequenzdiagramm-Auswahl 09/08/10 offen) |
+| 12.10.2026 | Sequenzdiagramm 3/5 erstellt: Post-Termin / Behandlung & Rezept (5 Lifelines, alt-Fragment Rezept + opt Folgetermin/Feedback) -- Sequenzdiagramm-09-PostTermin.drawio |
