@@ -180,11 +180,16 @@ Beziehungen:
 - **Vererbung** (Generalisierung): Pfeil mit hohlem Dreieck -- ein Use-Case ist ein Spezialfall eines anderen
 - Relationen moeglich zwischen Use-Case ↔ Use-Case sowie Akteur ↔ Akteur
 
+### Klassendiagramm (erledigt)
+- Datei: `Klassendiagramm.drawio` (draw.io; fuer Abgabe in Visual Paradigm nachbauen)
+- **15 Klassen** (Anforderung >=10 erfuellt), aus BPMN-Datenobjekten/-speichern und Akteuren abgeleitet
+- Klassen: Person (abstrakt), Patient, Arzt, Facharzt, Arztpraxis, Terminkalender, Termin, Ueberweisung, Patientenakte, Rezept, Medikament, Apotheke, Benachrichtigung, Videositzung, Notfallprotokoll
+- Jede Klasse mit Attributen und (wo sinnvoll) Methoden
+- Beziehungen: Vererbung (Patient/Arzt → Person, Facharzt → Arzt), 14 Assoziationen mit Multiplizitaeten (z.B. Patient 1 -- * Termin, Arztpraxis 1 -- 1 Terminkalender, Rezept * -- 1 Medikament)
+
 ### Noch offen (UML)
-- Klassendiagramm (min. 10 Klassen)
 - 5 Sequenzdiagramme (je als Unterdiagramm eines Use Case: Empfehlung Termin buchen, Termin absagen, Patient ueberweisen, Folgerezept, Videosprechstunde)
 - Finale Abgabe als VPP-Datei aus Visual Paradigm
-
 ---
 
 ## Abgaben & Aufgaben -- Uebersicht
@@ -195,12 +200,12 @@ Beziehungen:
 |--------------------------------|--------|----------|-------|
 | BPMN-Kollaborationsdiagramme   | 10     | 10       | 0     |
 | Use-Case-Diagramm              | 1      | 1        | 0     |
-| Klassendiagramm                | 1      | 0        | 1     |
+| Klassendiagramm                | 1      | 1        | 0     |
 | Sequenzdiagramme               | 5      | 0        | 5     |
 | Projektdokumentation (20 S.)   | 1      | 0        | 1     |
 | Abschlusspraesentation         | 1      | 0        | 1     |
 | Abgabe-ZIP                     | 1      | 0        | 1     |
-| **Gesamt**                     | **20** | **11**   | **9** |
+| **Gesamt**                     | **20** | **12**   | **8** |
 
 > Zusaetzlich liegen 2 Reserve-Diagramme (11, 12) final vor.
 
@@ -298,3 +303,4 @@ Beziehungen:
 | 06.10.2026 | Use-Case-Diagramm final: natuerlich formulierte Patient-Journey mit 12 Use Cases (10 Hauptschritte + 2 optionale/alternative), ohne starre 1:1-BPMN-Beschriftung |
 | 12.10.2026 | Use-Case-Diagramm an UML-Syntaxregeln (Betreuer-Blatt) angepasst: nummerierte Ablaufpfeile entfernt (Use-Case zeigt KEINEN Kontrollfluss/Reihenfolge); nur Mitwirkung, «include», «extend», Vererbung; Systemgrenze; 12 Use Cases |
 | 12.10.2026 | KI.md aktualisiert: neuer Abschnitt UML-Modellierung inkl. Use-Case-Syntaxregeln; Stand-Datum auf 12.10.2026 |
+| 12.10.2026 | Klassendiagramm in draw.io erstellt (15 Klassen, Vererbung + 14 Assoziationen mit Multiplizitaeten) -- Klassendiagramm.drawio |
