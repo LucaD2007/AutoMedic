@@ -190,7 +190,7 @@ Beziehungen:
 ### Noch offen (UML)
 - 5 Sequenzdiagramme (je als Unterdiagramm des zugehoerigen Use Case). Ausgewaehlt nach Akteur-Vielfalt, UML-Fragmenten und Klassenabdeckung:
   1. Termin suchen & buchen (01) -- ERLEDIGT (Sequenzdiagramm-01-TerminBuchen.drawio); Patient/System/Terminkalender/Termin/Arztpraxis; alt-Fragment (Slot frei/vergeben)
-  2. Patient ueberweisen (05) -- komplexeste Interaktion; Hausarzt/System/Patient/Facharzt; Multi-Teilnehmer
+  2. Patient ueberweisen (05) -- ERLEDIGT (Sequenzdiagramm-05-PatientUeberweisen.drawio); 6 Lifelines (Hausarzt/System/Ueberweisung/Terminkalender/Patient/Facharzt); par-Fragment fuer parallele Benachrichtigung
   3. Post-Termin / Behandlung & Rezept (09) -- Arzt/System/Patient; alt-Fragment, rezeptAusstellen()/freigeben()
   4. Apotheke suchen (08) -- externer Akteur Apotheke; opt-Fragment; verfuegbarkeitPruefen()/reservieren()
   5. Patientenregistrierung (10) -- Journey-Einstieg; Patient/System/Arztpraxis; alt/loop (Datenpruefung)
@@ -207,11 +207,11 @@ Beziehungen:
 | BPMN-Kollaborationsdiagramme   | 10     | 10       | 0     |
 | Use-Case-Diagramm              | 1      | 1        | 0     |
 | Klassendiagramm                | 1      | 1        | 0     |
-| Sequenzdiagramme               | 5      | 1        | 4     |
+| Sequenzdiagramme               | 5      | 2        | 3     |
 | Projektdokumentation (20 S.)   | 1      | 0        | 1     |
 | Abschlusspraesentation         | 1      | 0        | 1     |
 | Abgabe-ZIP                     | 1      | 0        | 1     |
-| **Gesamt**                     | **20** | **13**   | **7** |
+| **Gesamt**                     | **20** | **14**   | **6** |
 
 > Zusaetzlich liegen 2 Reserve-Diagramme (11, 12) final vor.
 
@@ -278,10 +278,11 @@ Beziehungen:
 | Prio | Aufgabe | Zustaendig | Hinweis |
 |------|---------|-----------|---------|
 | 1 | Abschlusspraesentation vorbereiten + proben | alle | Termin Mitte Oktober, individuelle Bewertung |
-| 1 | Use-Case-Diagramm (>=10 UC) + Klassendiagramm (>=10 Klassen) starten | Thilo, Helen | direkt aus BPMN/Datenobjekten ableitbar || 2 | BPMN-Dateinamen vereinheitlichen + Pool-Benennung 08 angleichen + Camunda-Ablage/Export | Lennart | schnell, blockt Abgabe |
-| 3 | 5 Sequenzdiagramme (Termin buchen, Termin absagen, Patient ueberweisen, Folgerezept, Videosprechstunde) als UC-Unterdiagramme | Thilo | nach Use Cases |
-| 4 | Projektdokumentation (~20 S.) finalisieren | Luca | Material groesstenteils in KI.md vorhanden |
-| 5 | Abgabe-ZIP buendeln + Moodle-Upload | alle | Deadline 13.11., 23:59 |
+| 2 | Restliche 3 Sequenzdiagramme (09 Post-Termin, 08 Apotheke suchen, 10 Patientenregistrierung) als UC-Unterdiagramme | Thilo | 2 von 5 erledigt (01, 05) |
+| 3 | UML-Diagramme in Visual Paradigm nachbauen und als VPP exportieren | Thilo, Helen | draw.io-Entwuerfe liegen vor |
+| 4 | BPMN-Dateinamen vereinheitlichen + Pool-Benennung 08 angleichen + Camunda-Ablage/Export | Lennart | schnell, blockt Abgabe |
+| 5 | Projektdokumentation (~20 S.) finalisieren | Luca | Material groesstenteils in KI.md vorhanden |
+| 6 | Abgabe-ZIP buendeln + Moodle-Upload | alle | Deadline 13.11., 23:59 |
 
 **Ableitungshilfe UML aus BPMN:**
 - Akteure: Patient, Arzt/Hausarzt, Facharzt, Praxismitarbeiter, Apotheke
@@ -311,3 +312,5 @@ Beziehungen:
 | 12.10.2026 | KI.md aktualisiert: neuer Abschnitt UML-Modellierung inkl. Use-Case-Syntaxregeln; Stand-Datum auf 12.10.2026 |
 | 12.10.2026 | Klassendiagramm in draw.io erstellt (15 Klassen, Vererbung + 14 Assoziationen mit Multiplizitaeten) -- Klassendiagramm.drawio |
 | 12.10.2026 | Sequenzdiagramm 1/5 erstellt: Termin suchen & buchen (5 Lifelines, 14 Nachrichten, alt-Fragment) -- Sequenzdiagramm-01-TerminBuchen.drawio |
+| 12.10.2026 | Sequenzdiagramm 2/5 erstellt: Patient ueberweisen (6 Lifelines, par-Fragment, Selbstaufruf patientenakteAnlegen) -- Sequenzdiagramm-05-PatientUeberweisen.drawio |
+| 12.10.2026 | Fehlenden Download-Link zu Sequenzdiagramm 2 nachgereicht; Naechste-Schritte-Tabelle aktualisiert (Use-Case/Klassendiagramm erledigt, Sequenzdiagramm-Auswahl 09/08/10 offen) |
