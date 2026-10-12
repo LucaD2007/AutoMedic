@@ -1,7 +1,7 @@
 # Fallstudie -- Digitale Terminbuchungsplattform fuer Arztpraxen
 
 **Modul:** Methoden der Wirtschaftsinformatik (3. Semester)
-**Stand:** 08. September 2026
+**Stand:** 12. Oktober 2026
 **Abgabefrist:** 13.11.2026, 23:59 Uhr (Moodle-Upload)
 **Abschlusspraesentation:** Mitte Oktober 2026
 
@@ -149,6 +149,44 @@ Die vollstaendige Pruefcheckliste befindet sich in der separaten Datei `BPMN_Che
 
 ---
 
+## UML-Modellierung
+
+### Use-Case-Diagramm (erledigt)
+- Datei: `UseCase-Diagramm.drawio` (draw.io; fuer Abgabe in Visual Paradigm nachbauen)
+- Darstellung als beispielhafter Patienten-Durchlauf, **12 Use Cases** (Anforderung >=10 erfuellt), natuerlich formuliert
+- Akteure: Patient (primaer), Praxisteam, Arzt, Facharzt, Apotheke
+- Use Cases: Online anmelden, Termin finden und buchen, Termin verschieben, Termin absagen, An den Termin erinnert werden, In der Praxis einchecken, Untersuchung und Diagnose erhalten, An einen Facharzt ueberwiesen werden, Rezept ausgestellt bekommen, Medikament in der Apotheke abholen, Folgetermin vereinbaren, Per Videosprechstunde beraten lassen
+- Enthaltene Relationen: Mitwirkung, «include» (Verschieben enthaelt Buchen), «extend» (Absagen→Erinnerung, Folgetermin→Untersuchung), Vererbung (Videosprechstunde ist Spezialfall der Untersuchung); Systemgrenze vorhanden
+
+### Use-Case-Syntaxregeln (laut Betreuer-Blatt)
+
+Grundlagen:
+- Verhaltensdiagramm; zeigt die aus Perspektive eines oder mehrerer Akteure bereitgestellten Anwendungsfaelle eines Systems
+- "Anwendungsfall-Diagramm", 1. Schritt der OOA-Modellierung; Sammlung identifizierbarer Benutzungsmoeglichkeiten
+- Fokus: prozessbasiertes System aus Sicht des Endbenutzers (hoher Abstraktionsgrad)
+- **WICHTIG: Ein Use-Case-Diagramm stellt KEINEN Kontrollfluss oder Datenfluss dar -- keine Festlegung der Reihenfolge von Use-Cases!**
+- Use-Cases werden spaeter durch UML-Interaktionsdiagramme (Sequenzdiagramme) verfeinert
+- Mindestens 10 Use Cases
+
+Elemente:
+- **Use Case** = Ellipse (elementarer Geschaeftsprozess)
+- **Akteur** = Strichmaennchen (beteiligte Person und/oder Rolle)
+- **Systemgrenze** = Kasten um die Use Cases (optional)
+
+Beziehungen:
+- **Mitwirkung** (Assoziation): einfache Linie -- ein oder mehrere Akteure nehmen an einem Use-Case teil (Akteur ↔ Use-Case)
+- **Komposition / «include»**: gestrichelter Pfeil -- ein Use-Case umfasst einen anderen vollstaendig ("enthaelt"; der eingebundene ist ein Subprozess)
+- **Erweiterung / «extend»**: gestrichelter Pfeil -- ein Use-Case erweitert einen anderen logisch (optional, "folgt auf" / "kommt nach diesem"; ausdruecklich KEINE Vererbung)
+- **Vererbung** (Generalisierung): Pfeil mit hohlem Dreieck -- ein Use-Case ist ein Spezialfall eines anderen
+- Relationen moeglich zwischen Use-Case ↔ Use-Case sowie Akteur ↔ Akteur
+
+### Noch offen (UML)
+- Klassendiagramm (min. 10 Klassen)
+- 5 Sequenzdiagramme (je als Unterdiagramm eines Use Case: Empfehlung Termin buchen, Termin absagen, Patient ueberweisen, Folgerezept, Videosprechstunde)
+- Finale Abgabe als VPP-Datei aus Visual Paradigm
+
+---
+
 ## Abgaben & Aufgaben -- Uebersicht
 
 ### Fortschritt Gesamtuebersicht
@@ -156,13 +194,13 @@ Die vollstaendige Pruefcheckliste befindet sich in der separaten Datei `BPMN_Che
 | Artefakt                       | Anzahl | Erledigt | Offen |
 |--------------------------------|--------|----------|-------|
 | BPMN-Kollaborationsdiagramme   | 10     | 10       | 0     |
-| Use-Case-Diagramm              | 1      | 0        | 1     |
+| Use-Case-Diagramm              | 1      | 1        | 0     |
 | Klassendiagramm                | 1      | 0        | 1     |
 | Sequenzdiagramme               | 5      | 0        | 5     |
 | Projektdokumentation (20 S.)   | 1      | 0        | 1     |
 | Abschlusspraesentation         | 1      | 0        | 1     |
 | Abgabe-ZIP                     | 1      | 0        | 1     |
-| **Gesamt**                     | **20** | **10**   | **10**|
+| **Gesamt**                     | **20** | **11**   | **9** |
 
 > Zusaetzlich liegen 2 Reserve-Diagramme (11, 12) final vor.
 
@@ -222,14 +260,22 @@ Die vollstaendige Pruefcheckliste befindet sich in der separaten Datei `BPMN_Che
 
 ---
 
-## Naechste Schritte
+## Naechste Schritte (priorisiert, Stand 06.10.2026)
 
-1. BPMN-Dateinamen vereinheitlichen (ohne Umlaute/Suffixe) und Pool-Benennung in Diagramm 08 angleichen
-2. BPMN-Diagramme ins Camunda Cloud Repository ablegen
-3. UML-Modelle erstellen (Use Cases, Klassendiagramme, 5 Sequenzdiagramme) in Visual Paradigm
-4. Projektdokumentation anfertigen (ca. 20 Seiten)
-5. Abschlusspraesentation vorbereiten
-6. Alles im Abgabe-ZIP buendeln und in Moodle hochladen
+**Zeitrahmen:** Abschlusspraesentation Mitte Oktober 2026 (ca. 1-2 Wochen), vollstaendige Abgabe 13.11.2026.
+
+| Prio | Aufgabe | Zustaendig | Hinweis |
+|------|---------|-----------|---------|
+| 1 | Abschlusspraesentation vorbereiten + proben | alle | Termin Mitte Oktober, individuelle Bewertung |
+| 1 | Use-Case-Diagramm (>=10 UC) + Klassendiagramm (>=10 Klassen) starten | Thilo, Helen | direkt aus BPMN/Datenobjekten ableitbar || 2 | BPMN-Dateinamen vereinheitlichen + Pool-Benennung 08 angleichen + Camunda-Ablage/Export | Lennart | schnell, blockt Abgabe |
+| 3 | 5 Sequenzdiagramme (Termin buchen, Termin absagen, Patient ueberweisen, Folgerezept, Videosprechstunde) als UC-Unterdiagramme | Thilo | nach Use Cases |
+| 4 | Projektdokumentation (~20 S.) finalisieren | Luca | Material groesstenteils in KI.md vorhanden |
+| 5 | Abgabe-ZIP buendeln + Moodle-Upload | alle | Deadline 13.11., 23:59 |
+
+**Ableitungshilfe UML aus BPMN:**
+- Akteure: Patient, Arzt/Hausarzt, Facharzt, Praxismitarbeiter, Apotheke
+- Use Cases (12 aus Prozessen): Registrieren, Termin suchen & buchen, Termin absagen, Termin verschieben, Terminerinnerung erhalten, Check-in, Notfall melden, Patient ueberweisen, Apotheke suchen, Folgerezept anfordern, Videosprechstunde buchen, Post-Termin-Nachbereitung
+- Klassenkandidaten (aus Datenobjekten/Data Stores): Patient, Arzt, Facharzt, Praxis, Termin, Terminkalender, Rezept, Medikament, Apotheke, Ueberweisung, Patientenakte, Benachrichtigung, Notfallprotokoll, Videositzung, Benutzerkonto
 
 ---
 
@@ -245,3 +291,10 @@ Die vollstaendige Pruefcheckliste befindet sich in der separaten Datei `BPMN_Che
 | 08.09.2026 | Betreuer-Feedback: zu komplex, Richtwert 10 Activities (+/-2), Onboarding-Fokus, Details via Subprozesse abstrahieren |
 | 08.09.2026 | Alle Diagramme nach Feedback ueberarbeitet (reduziert, Subprozesse, einheitliche Benennung, Happy-Path) |
 | 08.09.2026 | Alle 12 finalen BPMN-Dateien eingespielt; alte/defekte Duplikate entfernt; Detailaufbau an aktuellen Stand angepasst; Datei umbenannt von KI_Luca.md zu KI.md |
+| 06.10.2026 | Naechste Schritte priorisiert (Praesentation + UML zeitkritisch) |
+| 06.10.2026 | Use-Case-Diagramm in draw.io erstellt (5 Akteure, 12 Use Cases, include/extend) -- UseCase-Diagramm.drawio |
+| 06.10.2026 | Use-Case-Diagramm neu als Patienten-Durchlauf (Journey) gestaltet: Online registrieren -> buchen -> verschieben -> Erinnerung -> Check-In -> Behandlung/Diagnose -> Facharzt-Ueberweisung -> Rezept -> Apotheke; nummerierter Ablauf |
+| 06.10.2026 | Use-Case-Diagramm erweitert auf 12 Use Cases (= alle 12 BPMNs, 1:1): Hauptpfad + Zweige (Verschieben/Absagen optional, Notfall/Videosprechstunde alternativ, Folgerezept Folgebesuch) |
+| 06.10.2026 | Use-Case-Diagramm final: natuerlich formulierte Patient-Journey mit 12 Use Cases (10 Hauptschritte + 2 optionale/alternative), ohne starre 1:1-BPMN-Beschriftung |
+| 12.10.2026 | Use-Case-Diagramm an UML-Syntaxregeln (Betreuer-Blatt) angepasst: nummerierte Ablaufpfeile entfernt (Use-Case zeigt KEINEN Kontrollfluss/Reihenfolge); nur Mitwirkung, «include», «extend», Vererbung; Systemgrenze; 12 Use Cases |
+| 12.10.2026 | KI.md aktualisiert: neuer Abschnitt UML-Modellierung inkl. Use-Case-Syntaxregeln; Stand-Datum auf 12.10.2026 |
