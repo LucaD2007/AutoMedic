@@ -2,7 +2,7 @@
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_6" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.49.0">
   <bpmn:collaboration id="Collaboration_06">
     <bpmn:participant id="Pool_Patient" name="Patient" processRef="Process_Patient" />
-    <bpmn:participant id="Pool_System" name="Terminbuchungsplattform" processRef="Process_System" />
+    <bpmn:participant id="Pool_System" name="Gesundheitsplattform" processRef="Process_System" />
     <bpmn:participant id="Pool_Praxis" name="Arztpraxis" processRef="Process_Praxis" />
     <bpmn:messageFlow id="MF_01" name="Check-In-Daten" sourceRef="Task_P_CheckIn" targetRef="Start_System" />
     <bpmn:messageFlow id="MF_02" name="Wartenummer und Wartezeit" sourceRef="Task_S_AnwesendMarkieren" targetRef="Task_P_WartenummerErhalten" />
@@ -146,6 +146,7 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Shape_Pool_System" bpmnElement="Pool_System" isHorizontal="true">
         <dc:Bounds x="160" y="410" width="1000" height="290" />
+        <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Shape_Start_System" bpmnElement="Start_System">
         <dc:Bounds x="222" y="512" width="36" height="36" />

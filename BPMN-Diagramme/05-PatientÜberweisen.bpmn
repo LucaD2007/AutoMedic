@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_5" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.50.1">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_5" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.49.0">
   <bpmn:collaboration id="Collaboration_05">
     <bpmn:participant id="Pool_Arzt" name="Hausarzt" processRef="Process_Arzt" />
-    <bpmn:participant id="Pool_System" name="Terminbuchungsplattform" processRef="Process_System" />
+    <bpmn:participant id="Pool_System" name="Gesundheitsplattform" processRef="Process_System" />
     <bpmn:participant id="Pool_Patient" name="Patient" processRef="Process_Patient" />
     <bpmn:participant id="Pool_Facharzt" name="Facharzt" processRef="Process_Facharzt" />
     <bpmn:messageFlow id="MF_01" name="Überweisung" sourceRef="Task_A_Erstellen" targetRef="Start_System" />
@@ -180,6 +180,7 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Shape_Pool_System" bpmnElement="Pool_System" isHorizontal="true">
         <dc:Bounds x="120" y="340" width="1480" height="230" />
+        <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Shape_S_Benachrichtigen" bpmnElement="Task_S_Benachrichtigen">
         <dc:Bounds x="1180" y="390" width="160" height="80" />
@@ -202,6 +203,9 @@
         <dc:Bounds x="625" y="390" width="150" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_S_Ermitteln" bpmnElement="Task_S_Ermitteln">
+        <dc:Bounds x="380" y="390" width="180" height="80" />
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Shape_Start_System" bpmnElement="Start_System">
         <dc:Bounds x="292" y="412" width="36" height="36" />
         <bpmndi:BPMNLabel>
@@ -214,16 +218,13 @@
           <dc:Bounds x="1488" y="448" width="65" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Shape_S_Ermitteln" bpmnElement="Task_S_Ermitteln">
-        <dc:Bounds x="380" y="390" width="180" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="Edge_S1" bpmnElement="Flow_S1">
-        <di:waypoint x="328" y="430" />
-        <di:waypoint x="380" y="430" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Edge_S2" bpmnElement="Flow_S2">
         <di:waypoint x="560" y="430" />
         <di:waypoint x="625" y="430" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_S1" bpmnElement="Flow_S1">
+        <di:waypoint x="328" y="430" />
+        <di:waypoint x="380" y="430" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Edge_S5" bpmnElement="Flow_S5">
         <di:waypoint x="1340" y="430" />
@@ -329,6 +330,14 @@
         <di:waypoint x="370" y="170" />
         <di:waypoint x="379" y="135" />
       </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataInputAssociation_1ehn5zt_di" bpmnElement="DataInputAssociation_1ehn5zt">
+        <di:waypoint x="992" y="500" />
+        <di:waypoint x="1027" y="469" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataOutputAssociation_07wvr4d_di" bpmnElement="DataOutputAssociation_07wvr4d">
+        <di:waypoint x="1027" y="469" />
+        <di:waypoint x="992" y="500" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="DataInputAssociation_0d73s9m_di" bpmnElement="DataInputAssociation_0d73s9m">
         <di:waypoint x="950" y="500" />
         <di:waypoint x="920" y="470" />
@@ -382,14 +391,6 @@
         <bpmndi:BPMNLabel>
           <dc:Bounds x="1262" y="315" width="95" height="14" />
         </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="DataInputAssociation_1ehn5zt_di" bpmnElement="DataInputAssociation_1ehn5zt">
-        <di:waypoint x="992" y="500" />
-        <di:waypoint x="1027" y="469" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="DataOutputAssociation_07wvr4d_di" bpmnElement="DataOutputAssociation_07wvr4d">
-        <di:waypoint x="1027" y="469" />
-        <di:waypoint x="992" y="500" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

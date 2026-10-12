@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="bpmn-js (https://demo.bpmn.io)" exporterVersion="18.31.0">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.49.0">
   <bpmn:collaboration id="Collaboration_01">
     <bpmn:participant id="Pool_Patient" name="Patient" processRef="Process_Patient" />
-    <bpmn:participant id="Pool_System" name="Terminbuchungsplattform" processRef="Process_System" />
+    <bpmn:participant id="Pool_System" name="Gesundheitsplattform" processRef="Process_System" />
     <bpmn:participant id="Pool_Praxis" name="Arztpraxis" processRef="Process_Praxis" />
     <bpmn:messageFlow id="MF_01" name="Suchanfrage" sourceRef="Task_P_TermineSuchen" targetRef="Task_S_SuchanfrageEmpfangen" />
     <bpmn:messageFlow id="MF_02" name="Verfügbare Termine" sourceRef="Task_S_TermineAnzeigen" targetRef="Task_P_TerminAuswaehlen" />

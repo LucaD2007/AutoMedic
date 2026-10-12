@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_09" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.50.1">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_09" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.49.0">
   <bpmn:collaboration id="Collaboration_09">
     <bpmn:participant id="Pool_Arzt" name="Arzt" processRef="Process_Arzt" />
-    <bpmn:participant id="Pool_System" name="Terminbuchungsplattform" processRef="Process_System" />
+    <bpmn:participant id="Pool_System" name="Gesundheitsplattform" processRef="Process_System" />
     <bpmn:participant id="Pool_Patient" name="Patient" processRef="Process_Patient" />
     <bpmn:messageFlow id="MF1" name="Behandlungsdokumentation" sourceRef="End_A" targetRef="Start_S" />
     <bpmn:messageFlow id="MF2" name="Zusammenfassung inkl. Rezept (falls vorhanden)" sourceRef="Task_S3" targetRef="Start_P" />
@@ -296,6 +296,7 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Shape_Pool_System" bpmnElement="Pool_System" isHorizontal="true">
         <dc:Bounds x="160" y="410" width="1450" height="325" />
+        <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Shape_Start_S" bpmnElement="Start_S">
         <dc:Bounds x="222" y="522" width="36" height="36" />
@@ -361,14 +362,6 @@
         <di:waypoint x="430" y="540" />
         <di:waypoint x="495" y="540" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0hu6oyl_di" bpmnElement="Flow_0hu6oyl">
-        <di:waypoint x="520" y="515" />
-        <di:waypoint x="520" y="470" />
-        <di:waypoint x="570" y="470" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="529" y="490" width="12" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1oej30x_di" bpmnElement="Flow_1oej30x">
         <di:waypoint x="690" y="470" />
         <di:waypoint x="930" y="470" />
@@ -390,6 +383,14 @@
       <bpmndi:BPMNEdge id="Flow_0ia3cv0_di" bpmnElement="Flow_0ia3cv0">
         <di:waypoint x="1170" y="540" />
         <di:waypoint x="1220" y="540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0hu6oyl_di" bpmnElement="Flow_0hu6oyl">
+        <di:waypoint x="520" y="515" />
+        <di:waypoint x="520" y="470" />
+        <di:waypoint x="570" y="470" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="529" y="490" width="12" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Shape_Pool_Patient" bpmnElement="Pool_Patient" isHorizontal="true">
         <dc:Bounds x="160" y="780" width="1450" height="310" />
@@ -506,13 +507,13 @@
         <di:waypoint x="370" y="580" />
         <di:waypoint x="370" y="610" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Edge_DOA_S_Rezept" bpmnElement="DOA_S_Rezept">
-        <di:waypoint x="687" y="506" />
-        <di:waypoint x="715" y="524" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Edge_DOA_S_Termine" bpmnElement="DOA_S_Termine">
         <di:waypoint x="1317" y="580" />
         <di:waypoint x="1377" y="645" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_DOA_S_Rezept" bpmnElement="DOA_S_Rezept">
+        <di:waypoint x="687" y="506" />
+        <di:waypoint x="715" y="524" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Edge_MF1" bpmnElement="MF1">
         <di:waypoint x="1208" y="208" />

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_02" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.46.1">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_02" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.49.0">
   <bpmn:collaboration id="Collab_02">
     <bpmn:participant id="Pool_Patient" name="Patient" processRef="Proc_Patient" />
-    <bpmn:participant id="Pool_System" name="Terminbuchungsplattform" processRef="Proc_System" />
+    <bpmn:participant id="Pool_System" name="Gesundheitsplattform" processRef="Proc_System" />
     <bpmn:participant id="Pool_Praxis" name="Arztpraxis" processRef="Proc_Praxis" />
     <bpmn:messageFlow id="MF01" name="Absageanfrage" sourceRef="T_P_AbsageSenden" targetRef="Start_System" />
     <bpmn:messageFlow id="MF02" name="Absagebestaetigung" sourceRef="T_S_BestaetigungSenden" targetRef="ICE_P_Bestaetigung" />
@@ -180,6 +180,7 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="S_Pool_System" bpmnElement="Pool_System" isHorizontal="true">
         <dc:Bounds x="160" y="400" width="940" height="300" />
+        <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="S_StartS" bpmnElement="Start_System">
         <dc:Bounds x="232" y="512" width="36" height="36" />
@@ -296,6 +297,14 @@
         <di:waypoint x="268" y="885" />
         <di:waypoint x="320" y="885" />
       </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1pn0m6b_di" bpmnElement="Flow_1pn0m6b">
+        <di:waypoint x="420" y="885" />
+        <di:waypoint x="480" y="885" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1o9w973_di" bpmnElement="Flow_1o9w973">
+        <di:waypoint x="580" y="885" />
+        <di:waypoint x="625" y="885" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="E_Pr3Ja" bpmnElement="F_Pr3_Ja">
         <di:waypoint x="650" y="860" />
         <di:waypoint x="650" y="838" />
@@ -320,14 +329,6 @@
         <di:waypoint x="905" y="885" />
         <di:waypoint x="952" y="885" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1pn0m6b_di" bpmnElement="Flow_1pn0m6b">
-        <di:waypoint x="420" y="885" />
-        <di:waypoint x="480" y="885" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1o9w973_di" bpmnElement="Flow_1o9w973">
-        <di:waypoint x="580" y="885" />
-        <di:waypoint x="625" y="885" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="E_DIA_P1" bpmnElement="DIA_P1">
         <di:waypoint x="520" y="155" />
         <di:waypoint x="520" y="210" />
@@ -335,6 +336,14 @@
       <bpmndi:BPMNEdge id="E_DIA_S1" bpmnElement="DIA_S1">
         <di:waypoint x="370" y="602" />
         <di:waypoint x="370" y="570" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataOutputAssociation_1m91l75_di" bpmnElement="DataOutputAssociation_1m91l75">
+        <di:waypoint x="370" y="845" />
+        <di:waypoint x="370" y="652" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataOutputAssociation_0uefljs_di" bpmnElement="DataOutputAssociation_0uefljs">
+        <di:waypoint x="528" y="925" />
+        <di:waypoint x="526" y="995" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="E_MF01" bpmnElement="MF01">
         <di:waypoint x="530" y="290" />
@@ -362,14 +371,6 @@
         <bpmndi:BPMNLabel>
           <dc:Bounds x="393" y="705" width="85" height="27" />
         </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="DataOutputAssociation_1m91l75_di" bpmnElement="DataOutputAssociation_1m91l75">
-        <di:waypoint x="370" y="845" />
-        <di:waypoint x="370" y="652" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="DataOutputAssociation_0uefljs_di" bpmnElement="DataOutputAssociation_0uefljs">
-        <di:waypoint x="528" y="925" />
-        <di:waypoint x="526" y="995" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
